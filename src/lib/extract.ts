@@ -17,13 +17,25 @@ export async function extractInvoice(file: File): Promise<InvoiceData> {
   const key = getStoredApiKey();
   if (key) headers["x-gemini-key"] = key;
 
-  const res = await fetch("/api/extract", {
-    method: "POST",
-    headers,
-    body: formData,
-  });
+  let res: Response;
+  try {
+    res = await fetch("/api/extract", {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+  } catch {
+    throw new ExtractionError(
+      "Could not reach the server. Check your connection and try again."
+    );
+  }
 
-  const json = await res.json();
+  let json: { data?: InvoiceData; error?: string; code?: string };
+  try {
+    json = await res.json();
+  } catch {
+    throw new ExtractionError("Unexpected server response. Please try again.");
+  }
 
   if (!res.ok) {
     throw new ExtractionError(json.error || "Extraction failed.", json.code);

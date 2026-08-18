@@ -19,8 +19,8 @@ export function StepIndicator({
         const isDone = i < currentIndex;
         const isCurrent = i === currentIndex;
         return (
-          <li key={step.key} className="flex flex-1 items-center last:flex-none">
-            <div className="flex items-center gap-2.5">
+          <li key={step.key} className="flex min-w-0 flex-1 items-center last:flex-none">
+            <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
               <div
                 className={cn(
                   "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors",
@@ -33,8 +33,9 @@ export function StepIndicator({
               </div>
               <span
                 className={cn(
-                  "text-sm font-medium whitespace-nowrap",
-                  isCurrent ? "text-neutral-900" : isDone ? "text-neutral-600" : "text-neutral-400"
+                  "truncate text-sm font-medium",
+                  isCurrent ? "text-neutral-900" : isDone ? "text-neutral-600" : "text-neutral-400",
+                  !isCurrent && "hidden sm:inline"
                 )}
               >
                 {step.label}
@@ -43,7 +44,7 @@ export function StepIndicator({
             {i < steps.length - 1 && (
               <div
                 className={cn(
-                  "mx-3 h-px flex-1 transition-colors",
+                  "mx-2 h-px min-w-4 flex-1 transition-colors sm:mx-3",
                   isDone ? "bg-indigo-600" : "bg-neutral-200"
                 )}
               />

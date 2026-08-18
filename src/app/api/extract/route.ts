@@ -4,6 +4,8 @@ import { GoogleGenerativeAI, SchemaType, type Schema } from "@google/generative-
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB, mirrors the client-side dropzone limit
+
 const responseSchema = {
   type: SchemaType.OBJECT,
   properties: {
@@ -69,7 +71,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const formData = await req.formData();
+  let formData: FormData;
+  try {
+    formData = await req.formData();
+  } catch {
+    return NextResponse.json({ error: "No file provided." }, { status: 400 });
+  }
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
@@ -80,10 +87,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Only PDF files are supported." }, { status: 400 });
   }
 
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
+  if (file.size > MAX_FILE_SIZE) {
+    return NextResponse.json(
+      { error: "File is too large. Maximum size is 15MB." },
+      { status: 400 }
+    );
+  }
 
+  if (file.size === 0) {
+    return NextResponse.json({ error: "This file is empty." }, { status: 400 });
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  const header = Buffer.from(bytes.slice(0, 5)).toString("ascii");
+  if (header !== "%PDF-") {
+    return NextResponse.json(
+      { error: "This file is not a valid PDF. It may be corrupted or mislabeled." },
+      { status: 400 }
+    );
+  }
+
+  const base64 = Buffer.from(arrayBuffer).toString("base64");
+
+  try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: "gemini-3.6-flash",
@@ -99,11 +126,43 @@ export async function POST(req: NextRequest) {
     ]);
 
     const text = result.response.text();
-    const data = JSON.parse(text);
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return NextResponse.json(
+        { error: "The AI response could not be read. Please try this invoice again." },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({ data });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Extraction failed.";
-    return NextResponse.json({ error: message }, { status: 500 });
+
+    if (/api[ _]?key/i.test(message) || /API_KEY_INVALID/i.test(message)) {
+      return NextResponse.json(
+        { error: "Your Gemini API key was rejected. Check it in Settings.", code: "NO_API_KEY" },
+        { status: 401 }
+      );
+    }
+    if (/quota|rate.?limit|429/i.test(message)) {
+      return NextResponse.json(
+        { error: "Gemini rate limit reached. Wait a moment and try again." },
+        { status: 429 }
+      );
+    }
+    if (/503|overloaded|unavailable/i.test(message)) {
+      return NextResponse.json(
+        { error: "Gemini is temporarily overloaded. Please retry this invoice." },
+        { status: 503 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Extraction failed for this invoice. Please try again." },
+      { status: 500 }
+    );
   }
 }

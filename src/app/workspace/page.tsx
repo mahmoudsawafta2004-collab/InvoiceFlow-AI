@@ -49,8 +49,12 @@ export default function WorkspacePage() {
     setRows((prev) => {
       const existingNames = new Set(prev.map((r) => r.fileName));
       const additions: InvoiceRow[] = [];
+      let duplicateCount = 0;
       for (const file of newFiles) {
-        if (existingNames.has(file.name)) continue;
+        if (existingNames.has(file.name)) {
+          duplicateCount += 1;
+          continue;
+        }
         const id = makeId();
         filesRef.current.set(id, file);
         additions.push({
@@ -60,14 +64,55 @@ export default function WorkspacePage() {
           status: "queued",
         });
       }
-      const combined = [...prev, ...additions].slice(0, 50);
-      return combined;
+
+      const combined = [...prev, ...additions];
+      const overflow = Math.max(0, combined.length - 50);
+      const finalRows = combined.slice(0, 50);
+      for (const dropped of combined.slice(50)) {
+        filesRef.current.delete(dropped.id);
+      }
+
+      if (duplicateCount > 0) {
+        toast.info(
+          `Skipped ${duplicateCount} file${duplicateCount > 1 ? "s" : ""} already in the queue.`
+        );
+      }
+      if (overflow > 0) {
+        toast.info(`Only the first 50 files were kept — ${overflow} were not added.`);
+      }
+
+      return finalRows;
     });
   }
 
   function removeRow(id: string) {
     filesRef.current.delete(id);
     setRows((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  async function processRow(rowId: string) {
+    const file = filesRef.current.get(rowId);
+    if (!file) {
+      setRows((prev) =>
+        prev.map((r) =>
+          r.id === rowId
+            ? { ...r, status: "error", error: "The original file is no longer available." }
+            : r
+        )
+      );
+      return;
+    }
+    try {
+      const data = await extractInvoice(file);
+      setRows((prev) =>
+        prev.map((r) => (r.id === rowId ? { ...r, status: "done", data, error: undefined } : r))
+      );
+    } catch (err) {
+      const message = err instanceof ExtractionError ? err.message : "Extraction failed.";
+      setRows((prev) =>
+        prev.map((r) => (r.id === rowId ? { ...r, status: "error", error: message } : r))
+      );
+    }
   }
 
   async function startExtraction() {
@@ -77,30 +122,24 @@ export default function WorkspacePage() {
 
     let completed = 0;
     const total = rows.length;
+    const rowIds = rows.map((r) => r.id);
 
     setRows((prev) => prev.map((r) => ({ ...r, status: "processing" as const })));
 
-    await runWithConcurrency(rows, 4, async (row) => {
-      const file = filesRef.current.get(row.id);
-      if (!file) return;
-      try {
-        const data = await extractInvoice(file);
-        setRows((prev) =>
-          prev.map((r) => (r.id === row.id ? { ...r, status: "done", data } : r))
-        );
-      } catch (err) {
-        const message =
-          err instanceof ExtractionError ? err.message : "Extraction failed.";
-        setRows((prev) =>
-          prev.map((r) => (r.id === row.id ? { ...r, status: "error", error: message } : r))
-        );
-      } finally {
-        completed += 1;
-        setProgress(Math.round((completed / total) * 100));
-      }
+    await runWithConcurrency(rowIds, 4, async (rowId) => {
+      await processRow(rowId);
+      completed += 1;
+      setProgress(Math.round((completed / total) * 100));
     });
 
     setStage("review");
+  }
+
+  async function retryRow(rowId: string) {
+    setRows((prev) =>
+      prev.map((r) => (r.id === rowId ? { ...r, status: "processing", error: undefined } : r))
+    );
+    await processRow(rowId);
   }
 
   function updateField(rowId: string, field: FieldKey, value: string) {
@@ -265,6 +304,7 @@ export default function WorkspacePage() {
             rows={rows}
             onUpdateField={updateField}
             onRemoveRow={removeRow}
+            onRetryRow={retryRow}
           />
         </div>
       )}

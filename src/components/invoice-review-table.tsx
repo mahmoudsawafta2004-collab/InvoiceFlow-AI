@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Trash2 } from "lucide-react";
+import { AlertCircle, Loader2, RotateCw, Trash2 } from "lucide-react";
 import type { FieldKey, InvoiceRow } from "@/lib/types";
 import { EditableCell } from "@/components/editable-cell";
 import { ConfidenceBadge } from "@/components/confidence-badge";
@@ -17,10 +17,12 @@ export function InvoiceReviewTable({
   rows,
   onUpdateField,
   onRemoveRow,
+  onRetryRow,
 }: {
   rows: InvoiceRow[];
   onUpdateField: (rowId: string, field: FieldKey, value: string) => void;
   onRemoveRow: (rowId: string) => void;
+  onRetryRow: (rowId: string) => void;
 }) {
   const columns: { key: FieldKey; label: string; align: "left" | "right" }[] = [
     { key: "supplierName", label: "Supplier", align: "left" },
@@ -54,6 +56,27 @@ export function InvoiceReviewTable({
         </thead>
         <tbody className="divide-y divide-neutral-100">
           {rows.map((row) => {
+            if (row.status === "processing") {
+              return (
+                <tr key={row.id}>
+                  <td className="sticky left-0 z-10 bg-white px-4 py-3 align-top">
+                    <p className="max-w-[200px] truncate text-sm font-medium text-neutral-900">
+                      {row.fileName}
+                    </p>
+                    <p className="text-xs text-neutral-400">
+                      {formatFileSize(row.fileSize)}
+                    </p>
+                  </td>
+                  <td colSpan={columns.length + 1} className="px-2 py-3 align-top">
+                    <div className="flex items-center gap-2 text-sm text-neutral-500">
+                      <Loader2 className="h-4 w-4 shrink-0 animate-spin text-indigo-500" />
+                      Retrying extraction…
+                    </div>
+                  </td>
+                </tr>
+              );
+            }
+
             if (row.status === "error") {
               return (
                 <tr key={row.id} className="bg-red-50/40">
@@ -72,12 +95,22 @@ export function InvoiceReviewTable({
                     </div>
                   </td>
                   <td className="px-2 py-3 align-top">
-                    <button
-                      onClick={() => onRemoveRow(row.id)}
-                      className="rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => onRetryRow(row.id)}
+                        title="Retry extraction"
+                        className="rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-indigo-600"
+                      >
+                        <RotateCw className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => onRemoveRow(row.id)}
+                        title="Remove"
+                        className="rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
