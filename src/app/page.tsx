@@ -102,7 +102,7 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="mt-4 text-sm text-neutral-400">
-            No credit card required · Processes 50 invoices in under a minute
+            No credit card required · A full batch of 50 invoices in about 3 minutes
           </p>
         </div>
 
@@ -211,7 +211,7 @@ export default function LandingPage() {
             Stop typing invoices into spreadsheets by hand
           </h2>
           <p className="mt-3 text-neutral-400">
-            Upload your first batch and see the extracted results in under a minute.
+            Upload your first batch and see the extracted results in minutes.
           </p>
           <Link href="/workspace">
             <Button size="lg" className="mt-8 bg-white text-neutral-900 hover:bg-neutral-100">

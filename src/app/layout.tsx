@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "InvoiceFlow AI — Bulk Invoice PDF to Excel Converter",
   description:
-    "Upload up to 50 invoice PDFs and get a clean, structured Excel file in seconds. AI-powered extraction built for accountants and finance teams.",
+    "Upload up to 50 invoice PDFs and get a clean, structured Excel file in minutes. AI-powered extraction built for accountants and finance teams.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
