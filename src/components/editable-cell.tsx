@@ -48,12 +48,13 @@ export function EditableCell({
   return (
     <button
       type="button"
+      title={value}
       onClick={() => {
         setDraft(value);
         setEditing(true);
       }}
       className={cn(
-        "w-full rounded-md px-2 py-1 text-sm hover:bg-neutral-100",
+        "block w-full truncate whitespace-nowrap rounded-md px-2 py-1 text-sm hover:bg-neutral-100",
         align === "right" ? "text-right tabular-nums" : "text-left"
       )}
     >

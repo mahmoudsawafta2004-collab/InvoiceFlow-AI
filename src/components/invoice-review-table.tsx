@@ -9,7 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatFileSize } from "@/lib/utils";
+import { cn, formatFileSize } from "@/lib/utils";
 
 const numericFields: FieldKey[] = ["subtotal", "tax", "total"];
 
@@ -99,7 +99,13 @@ export function InvoiceReviewTable({
                   const field = data?.[col.key];
                   const value = field ? String(field.value) : "";
                   return (
-                    <td key={col.key} className="min-w-[130px] px-1 py-2 align-middle">
+                    <td
+                      key={col.key}
+                      className={cn(
+                        "px-1 py-2 align-middle",
+                        col.key === "supplierName" ? "min-w-[190px]" : "min-w-[130px]"
+                      )}
+                    >
                       <div className="flex items-center gap-1.5">
                         <div className="flex-1">
                           <EditableCell
