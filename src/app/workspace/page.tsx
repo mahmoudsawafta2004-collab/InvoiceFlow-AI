@@ -1,12 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
 import { toast } from "sonner";
 import {
+  AlertTriangle,
   ArrowRight,
   Download,
-  KeyRound,
   RotateCcw,
   Sparkles,
 } from "lucide-react";
@@ -21,7 +20,8 @@ import type { FieldKey, InvoiceRow } from "@/lib/types";
 import { extractInvoice, ExtractionError } from "@/lib/extract";
 import { runWithConcurrency } from "@/lib/pool";
 import { buildInvoiceWorkbook, downloadBlob } from "@/lib/excel";
-import { saveBatch, useApiKey } from "@/lib/storage";
+import { saveBatch } from "@/lib/storage";
+import { useServerKeyConfigured } from "@/lib/use-server-key";
 
 type Stage = "upload" | "processing" | "review";
 
@@ -43,7 +43,12 @@ export default function WorkspacePage() {
   const [progress, setProgress] = useState(0);
   const [exporting, setExporting] = useState(false);
   const filesRef = useRef<Map<string, File>>(new Map());
-  const hasApiKey = !!useApiKey();
+
+  // Extraction runs entirely on the deployment's own key. `serverKey` is null
+  // until /api/config answers, so the UI stays neutral until then.
+  const serverKey = useServerKeyConfigured();
+  const hasApiKey = serverKey === true;
+  const extractionUnavailable = serverKey === false;
 
   function handleFiles(newFiles: File[]) {
     setRows((prev) => {
@@ -209,27 +214,20 @@ export default function WorkspacePage() {
         <StepIndicator steps={steps} currentIndex={stageIndex[stage]} />
       </div>
 
-      {!hasApiKey && (
+      {extractionUnavailable && (
         <Card className="mb-6 border-amber-200 bg-amber-50">
-          <CardContent className="flex items-center justify-between gap-4 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100">
-                <KeyRound className="h-4.5 w-4.5 text-amber-700" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-amber-900">
-                  Add your Gemini API key to enable extraction
-                </p>
-                <p className="text-sm text-amber-700">
-                  You can still upload files now — add the key any time in Settings.
-                </p>
-              </div>
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100">
+              <AlertTriangle className="h-4.5 w-4.5 text-amber-700" />
             </div>
-            <Link href="/settings">
-              <Button size="sm" variant="outline" className="border-amber-300 bg-white">
-                Go to Settings
-              </Button>
-            </Link>
+            <div>
+              <p className="text-sm font-medium text-amber-900">
+                Extraction is temporarily unavailable
+              </p>
+              <p className="text-sm text-amber-700">
+                You can still upload files. Please try extracting again shortly.
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}

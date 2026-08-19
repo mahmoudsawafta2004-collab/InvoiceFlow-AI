@@ -2,7 +2,6 @@ import { useSyncExternalStore } from "react";
 import type { Batch, InvoiceRow } from "./types";
 
 const HISTORY_KEY = "invoiceflow.history";
-const API_KEY_STORAGE = "invoiceflow.geminiKey";
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
@@ -48,20 +47,6 @@ export function clearHistory() {
   emitChange();
 }
 
-export function getStoredApiKey(): string {
-  if (typeof window === "undefined") return "";
-  return localStorage.getItem(API_KEY_STORAGE) || "";
-}
-
-export function setStoredApiKey(key: string) {
-  if (key) {
-    localStorage.setItem(API_KEY_STORAGE, key);
-  } else {
-    localStorage.removeItem(API_KEY_STORAGE);
-  }
-  emitChange();
-}
-
 let historyCache: Batch[] = [];
 let historyCacheRaw: string | null = null;
 
@@ -86,16 +71,4 @@ function getHistoryServerSnapshot(): Batch[] {
 
 export function useHistory(): Batch[] {
   return useSyncExternalStore(subscribe, getHistorySnapshot, getHistoryServerSnapshot);
-}
-
-function getApiKeySnapshot(): string {
-  return localStorage.getItem(API_KEY_STORAGE) || "";
-}
-
-function getApiKeyServerSnapshot(): string {
-  return "";
-}
-
-export function useApiKey(): string {
-  return useSyncExternalStore(subscribe, getApiKeySnapshot, getApiKeyServerSnapshot);
 }

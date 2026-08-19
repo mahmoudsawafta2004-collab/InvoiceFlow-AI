@@ -45,27 +45,29 @@ for the expected extraction values.
 
 ## 3. The API key
 
-The app needs a Google Gemini API key. There are two ways to supply one, and
-both work at the same time.
+The app runs entirely on **your** Gemini key. Visitors never see or supply one —
+there is no key field anywhere in the interface.
 
-**Server-side (recommended for production).** Set `GEMINI_API_KEY` in the
-environment. Every visitor then uses your key, and you pay for usage.
+Set `GEMINI_API_KEY` in the environment:
 
 ```
 GEMINI_API_KEY=AIza...
 ```
 
-**Per-user (recommended for a free demo).** A visitor enters their own key on
-the Settings page. It is stored in their browser's local storage and sent with
-each extraction request. They pay for their own usage.
+Locally that goes in `.env.local`. On Vercel it goes in **Settings →
+Environment Variables**, and you must redeploy afterwards for it to take effect.
 
-The lookup order is in `src/app/api/extract/route.ts`: a key sent from the
-browser wins, and the environment variable is the fallback. If you want to
-force everyone onto your key, delete the `x-gemini-key` header read in that
-file.
+The key is read only in `src/app/api/extract/route.ts`, server-side, and is
+never sent to the browser. `GET /api/config` reports whether a key is
+configured — a boolean only, never the key itself — so the interface can
+disable extraction gracefully if it is missing.
 
-Get a key at https://aistudio.google.com/apikey. Google's free tier is enough
-for development and light demo use.
+Get a key at https://aistudio.google.com/apikey.
+
+**Because every visitor spends your quota, treat the public URL as a cost
+surface.** For an unlisted demo this is fine. Before promoting the site widely,
+add rate limiting or put the app behind a login — otherwise anyone who finds
+the URL can consume your Gemini budget.
 
 ---
 
@@ -97,8 +99,8 @@ src/
     workspace/page.tsx    The main flow: upload → extract → review → export
     dashboard/page.tsx    Aggregate stats across past batches
     history/page.tsx      Past batches with re-download
-    settings/page.tsx     API key management
     api/extract/route.ts  Server route that calls Gemini
+    api/config/route.ts   Reports whether a Gemini key is configured
   components/
     ui/                   Button, Card, Badge, Dialog, Input, Progress, …
     dropzone.tsx          Drag & drop with file validation
@@ -111,7 +113,8 @@ src/
     types.ts              Shared types, including the field list
     excel.ts              .xlsx generation via ExcelJS
     extract.ts            Client wrapper around /api/extract
-    storage.ts            Local-storage history and API key, as React hooks
+    storage.ts            Local-storage batch history, as a React hook
+    use-server-key.ts     Reads /api/config so the UI knows extraction is live
     pool.ts               Bounded-concurrency runner
     utils.ts              Formatting helpers and `cn`
 samples/                  Six synthetic invoices for testing and demos
@@ -149,7 +152,7 @@ is how many invoices are processed in parallel.
 
 Raising it makes batches faster but increases the requests-per-minute rate
 against Gemini. On a free-tier key, values above 4 will start hitting rate
-limits, which surface to the user as "Gemini rate limit reached". On a paid key
+limits, which surface as "Gemini rate limit reached". On a paid key
 with higher limits you can raise it.
 
 Measured: 6 invoices in 24 seconds at concurrency 4, which is roughly 3 minutes
@@ -172,9 +175,9 @@ and the `metadata` block in `src/app/layout.tsx`. The accent colour is Tailwind'
 
 ## 7. Where data is stored
 
-There is no database. Batch history and the user's API key live in the
-browser's local storage, so history is per-browser and clears when site data is
-cleared. Uploaded PDFs are held in memory for the duration of the session and
+There is no database. Batch history lives in the browser's local storage, so it
+is per-browser and clears when site data is cleared. The Gemini key lives only
+in the server environment and never reaches the browser. Uploaded PDFs are held in memory for the duration of the session and
 are never written to disk on the server — the extraction route holds a file in
 memory only long enough to forward it to Gemini.
 
@@ -191,8 +194,8 @@ The extraction route returns specific messages rather than generic failures:
 
 | Condition | Response |
 |-----------|----------|
-| No API key configured | 400, prompts the user to add one |
-| Key rejected by Google | 401, "Your Gemini API key was rejected" |
+| No key configured on the server | 503, neutral "not available right now" |
+| Key rejected by Google | 503, same neutral message (no key details leak) |
 | Rate limit hit | 429, asks the user to wait |
 | Gemini overloaded | 503, asks the user to retry |
 | File is not a real PDF | 400, header bytes are checked, not just the extension |

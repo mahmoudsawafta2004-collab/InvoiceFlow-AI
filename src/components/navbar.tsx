@@ -64,20 +64,13 @@ export function Navbar() {
               </Link>
             </>
           ) : (
-            <>
-              <Link href="/settings" className="hidden sm:block">
-                <Button variant="outline" size="sm">
-                  Settings
-                </Button>
-              </Link>
-              <button
-                onClick={() => setMenuOpen((v) => !v)}
-                className="flex h-9 w-9 items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-100 md:hidden"
-                aria-label="Toggle menu"
-              >
-                {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-            </>
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              className="flex h-9 w-9 items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-100 md:hidden"
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           )}
         </div>
       </div>
@@ -99,13 +92,6 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/settings"
-            onClick={() => setMenuOpen(false)}
-            className="rounded-md px-3 py-2 text-sm font-medium text-neutral-500 hover:text-neutral-900"
-          >
-            Settings
-          </Link>
         </nav>
       )}
     </header>

@@ -58,16 +58,15 @@ For each field, also return a confidence score between 0 and 1 reflecting how ce
 Return ONLY the structured data.`;
 
 export async function POST(req: NextRequest) {
-  const apiKey = req.headers.get("x-gemini-key") || process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json(
       {
-        error:
-          "No Gemini API key configured. Add one in Settings or set GEMINI_API_KEY in your environment.",
+        error: "Extraction is not available right now. Please try again later.",
         code: "NO_API_KEY",
       },
-      { status: 400 }
+      { status: 503 }
     );
   }
 
@@ -143,8 +142,8 @@ export async function POST(req: NextRequest) {
 
     if (/api[ _]?key/i.test(message) || /API_KEY_INVALID/i.test(message)) {
       return NextResponse.json(
-        { error: "Your Gemini API key was rejected. Check it in Settings.", code: "NO_API_KEY" },
-        { status: 401 }
+        { error: "Extraction is not available right now. Please try again later." },
+        { status: 503 }
       );
     }
     if (/quota|rate.?limit|429/i.test(message)) {

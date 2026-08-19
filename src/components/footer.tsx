@@ -14,9 +14,6 @@ export function Footer() {
           <Link href="/dashboard" className="hover:text-neutral-900">
             Dashboard
           </Link>
-          <Link href="/settings" className="hover:text-neutral-900">
-            Settings
-          </Link>
         </div>
       </div>
     </footer>

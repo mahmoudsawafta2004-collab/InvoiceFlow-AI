@@ -9,7 +9,7 @@ file in one click.
 - Next.js 16 (App Router) + TypeScript + Tailwind CSS
 - Google Gemini API for invoice field extraction
 - ExcelJS for `.xlsx` generation
-- Local browser storage for history and settings (no database required)
+- Local browser storage for batch history (no database required)
 
 ## Getting started
 
@@ -21,9 +21,8 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-You can also add a Gemini API key from within the app (Settings page) instead
-of using an environment variable — it's stored in the browser only and sent
-per-request to `/api/extract`.
+The app runs entirely on the key you configure. Visitors never see or supply
+one — there is no key field in the interface.
 
 Get a free Gemini API key at https://aistudio.google.com/apikey.
 
@@ -49,8 +48,8 @@ src/
     workspace/          Upload → AI Extraction → Review & Export flow
     dashboard/          Aggregate stats across past batches
     history/            Past batches, stored locally
-    settings/           Gemini API key management
     api/extract/        Server route that calls Gemini and returns structured data
+    api/config/         Reports whether a Gemini key is configured
   components/           UI primitives and feature components
   lib/                  Types, Excel export, extraction client, local storage
 ```

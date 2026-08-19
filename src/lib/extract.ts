@@ -1,5 +1,4 @@
 import type { InvoiceData } from "./types";
-import { getStoredApiKey } from "./storage";
 
 export class ExtractionError extends Error {
   code?: string;
@@ -13,15 +12,10 @@ export async function extractInvoice(file: File): Promise<InvoiceData> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const headers: HeadersInit = {};
-  const key = getStoredApiKey();
-  if (key) headers["x-gemini-key"] = key;
-
   let res: Response;
   try {
     res = await fetch("/api/extract", {
       method: "POST",
-      headers,
       body: formData,
     });
   } catch {
