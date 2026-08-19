@@ -27,6 +27,19 @@ per-request to `/api/extract`.
 
 Get a free Gemini API key at https://aistudio.google.com/apikey.
 
+## Try it
+
+`samples/` contains six synthetic invoice PDFs covering different layouts,
+currencies, and a case with no VAT and no due date. Drop them onto the
+Convert page to see the full flow. `samples/README.md` lists the correct
+values for verifying extraction accuracy.
+
+## Documentation
+
+[DOCUMENTATION.md](./DOCUMENTATION.md) covers deployment, customization
+(adding fields, changing the model, tuning batch speed), where data is
+stored, error handling, and known limits.
+
 ## Project structure
 
 ```

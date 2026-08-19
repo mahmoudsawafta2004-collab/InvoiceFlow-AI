@@ -47,14 +47,3 @@ export interface Batch {
   errorCount: number;
   rows: InvoiceRow[];
 }
-
-export const FIELD_LABELS: Record<FieldKey, string> = {
-  supplierName: "Supplier Name",
-  invoiceNumber: "Invoice Number",
-  invoiceDate: "Invoice Date",
-  dueDate: "Due Date",
-  currency: "Currency",
-  subtotal: "Subtotal",
-  tax: "VAT / Tax",
-  total: "Total Amount",
-};
