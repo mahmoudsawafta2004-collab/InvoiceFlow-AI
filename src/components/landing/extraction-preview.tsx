@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, useInView, useReducedMotion } from "motion/react";
 import { Check, FileText, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EASE } from "@/components/motion-primitives";
+import { useI18n } from "@/lib/i18n/context";
 
 type Row = {
   file: string;
@@ -28,24 +29,26 @@ const ROWS: Row[] = [
 const STEP_MS = 900;
 
 export function ExtractionPreview() {
+  const { t } = useI18n();
+  const p = t.landing.preview;
   const reduced = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  // `once` keeps the demo from replaying every time it scrolls back into view.
+  const inView = useInView(ref, { once: true, margin: "-15%" });
   const [done, setDone] = useState(reduced ? ROWS.length : 0);
 
   useEffect(() => {
-    if (reduced) return;
-    if (done >= ROWS.length) {
-      // Loop the demo so a visitor who arrives mid-cycle still sees it run.
-      const restart = setTimeout(() => setDone(0), 3600);
-      return () => clearTimeout(restart);
-    }
+    // Runs a single pass on first sight, then holds the finished table. A
+    // permanent loop pulls the eye away from the copy beside it.
+    if (reduced || !inView || done >= ROWS.length) return;
     const t = setTimeout(() => setDone((d) => d + 1), STEP_MS);
     return () => clearTimeout(t);
-  }, [done, reduced]);
+  }, [done, reduced, inView]);
 
   const pct = Math.round((done / ROWS.length) * 100);
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div ref={ref} className="mx-auto max-w-5xl">
       <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-float">
         {/* Chrome */}
         <div className="flex items-center gap-3 border-b border-line bg-surface-2 px-4 py-3">
@@ -55,7 +58,7 @@ export function ExtractionPreview() {
             <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
           </div>
           <div className="mx-auto flex items-center gap-2 rounded-md bg-surface-3 px-3 py-1 font-mono text-[11px] text-ink-3">
-            invoiceflow.ai/workspace
+            {p.url}
           </div>
         </div>
 
@@ -72,7 +75,7 @@ export function ExtractionPreview() {
                   className="flex items-center gap-2 text-ink-2"
                 >
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-accent" />
-                  Extracting invoice data…
+                  {p.extracting}
                 </motion.span>
               ) : (
                 <motion.span
@@ -83,7 +86,7 @@ export function ExtractionPreview() {
                   className="flex items-center gap-2 font-medium text-ok"
                 >
                   <Check className="h-3.5 w-3.5" />
-                  {ROWS.length} invoices extracted
+                  {p.extracted(ROWS.length)}
                 </motion.span>
               )}
             </AnimatePresence>
@@ -102,17 +105,19 @@ export function ExtractionPreview() {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left">
+          <table className="w-full min-w-[720px] text-start">
             <thead>
               <tr className="border-b border-line">
-                {["File", "Supplier", "Invoice #", "Date", "Total", ""].map((h) => (
-                  <th
-                    key={h}
-                    className="px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3"
-                  >
-                    {h}
-                  </th>
-                ))}
+                {[p.columns.file, p.columns.supplier, p.columns.number, p.columns.date, p.columns.total, ""].map(
+                  (h, i) => (
+                    <th
+                      key={i}
+                      className="px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3"
+                    >
+                      {h}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody>
@@ -134,7 +139,7 @@ export function ExtractionPreview() {
                     <Cell filled={filled} delay={0}>{row.supplier}</Cell>
                     <Cell filled={filled} delay={0.05} mono>{row.number}</Cell>
                     <Cell filled={filled} delay={0.1} mono>{row.date}</Cell>
-                    <Cell filled={filled} delay={0.15} mono align="right">
+                    <Cell filled={filled} delay={0.15} mono align="end">
                       {row.currency} {row.total}
                     </Cell>
                     <td className="px-5 py-3">
@@ -170,10 +175,7 @@ export function ExtractionPreview() {
         </div>
       </div>
 
-      <p className="mt-4 text-center text-[13px] text-ink-3">
-        Low-confidence fields are flagged, not guessed — the 72% row is an invoice
-        with no due date printed on it.
-      </p>
+      <p className="mt-4 text-center text-[13px] text-ink-3">{p.note}</p>
     </div>
   );
 }
@@ -183,16 +185,16 @@ function Cell({
   filled,
   delay,
   mono,
-  align = "left",
+  align = "start",
 }: {
   children: React.ReactNode;
   filled: boolean;
   delay: number;
   mono?: boolean;
-  align?: "left" | "right";
+  align?: "start" | "end";
 }) {
   return (
-    <td className={cn("px-5 py-3", align === "right" && "text-right")}>
+    <td className={cn("px-5 py-3", align === "end" && "text-end")}>
       {filled ? (
         <motion.span
           initial={{ opacity: 0, y: 3, filter: "blur(3px)" }}
@@ -208,7 +210,7 @@ function Cell({
       ) : (
         <span
           className="inline-block h-3 rounded bg-surface-3"
-          style={{ width: align === "right" ? "5.5rem" : "7rem" }}
+          style={{ width: align === "end" ? "5.5rem" : "7rem" }}
         />
       )}
     </td>

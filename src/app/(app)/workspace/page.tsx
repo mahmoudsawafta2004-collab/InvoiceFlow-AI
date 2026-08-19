@@ -22,14 +22,9 @@ import { runWithConcurrency } from "@/lib/pool";
 import { buildInvoiceWorkbook, downloadBlob } from "@/lib/excel";
 import { saveBatch } from "@/lib/storage";
 import { useServerKeyConfigured } from "@/lib/use-server-key";
+import { useI18n } from "@/lib/i18n/context";
 
 type Stage = "upload" | "processing" | "review";
-
-const steps: Step[] = [
-  { key: "upload", label: "Upload" },
-  { key: "processing", label: "AI Extraction" },
-  { key: "review", label: "Review & Export" },
-];
 
 const stageIndex: Record<Stage, number> = { upload: 0, processing: 1, review: 2 };
 
@@ -38,11 +33,19 @@ function makeId() {
 }
 
 export default function WorkspacePage() {
+  const { t } = useI18n();
+  const w = t.workspace;
   const [stage, setStage] = useState<Stage>("upload");
   const [rows, setRows] = useState<InvoiceRow[]>([]);
   const [progress, setProgress] = useState(0);
   const [exporting, setExporting] = useState(false);
   const filesRef = useRef<Map<string, File>>(new Map());
+
+  const steps: Step[] = [
+    { key: "upload", label: w.steps.upload },
+    { key: "processing", label: w.steps.extraction },
+    { key: "review", label: w.steps.review },
+  ];
 
   // Extraction runs entirely on the deployment's own key. `serverKey` is null
   // until /api/config answers, so the UI stays neutral until then.
@@ -78,12 +81,10 @@ export default function WorkspacePage() {
       }
 
       if (duplicateCount > 0) {
-        toast.info(
-          `Skipped ${duplicateCount} file${duplicateCount > 1 ? "s" : ""} already in the queue.`
-        );
+        toast.info(w.toasts.duplicatesSkipped(duplicateCount));
       }
       if (overflow > 0) {
-        toast.info(`Only the first 50 files were kept — ${overflow} were not added.`);
+        toast.info(w.toasts.overflowKept(overflow));
       }
 
       return finalRows;
@@ -100,9 +101,7 @@ export default function WorkspacePage() {
     if (!file) {
       setRows((prev) =>
         prev.map((r) =>
-          r.id === rowId
-            ? { ...r, status: "error", error: "The original file is no longer available." }
-            : r
+          r.id === rowId ? { ...r, status: "error", error: w.errors.fileGone } : r
         )
       );
       return;
@@ -113,7 +112,7 @@ export default function WorkspacePage() {
         prev.map((r) => (r.id === rowId ? { ...r, status: "done", data, error: undefined } : r))
       );
     } catch (err) {
-      const message = err instanceof ExtractionError ? err.message : "Extraction failed.";
+      const message = err instanceof ExtractionError ? err.message : w.errors.extractionFailed;
       setRows((prev) =>
         prev.map((r) => (r.id === rowId ? { ...r, status: "error", error: message } : r))
       );
@@ -171,11 +170,11 @@ export default function WorkspacePage() {
       const filename = `invoiceflow-export-${new Date().toISOString().slice(0, 10)}.xlsx`;
       downloadBlob(blob, filename);
       saveBatch(rows);
-      toast.success("Excel file exported", {
-        description: `${rows.filter((r) => r.status === "done").length} invoices included.`,
+      toast.success(w.toasts.exportSuccessTitle, {
+        description: w.toasts.exportSuccessDesc(rows.filter((r) => r.status === "done").length),
       });
     } catch {
-      toast.error("Export failed. Please try again.");
+      toast.error(w.toasts.exportError);
     } finally {
       setExporting(false);
     }
@@ -195,17 +194,13 @@ export default function WorkspacePage() {
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">
-            Convert Invoices
-          </h1>
-          <p className="mt-1 text-sm text-ink-2">
-            Upload, extract, review, and export — all in one place.
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">{w.title}</h1>
+          <p className="mt-1 text-sm text-ink-2">{w.subtitle}</p>
         </div>
         {stage !== "upload" && (
           <Button variant="outline" size="sm" onClick={resetAll}>
             <RotateCcw className="h-3.5 w-3.5" />
-            Start over
+            {w.startOver}
           </Button>
         )}
       </div>
@@ -221,12 +216,8 @@ export default function WorkspacePage() {
               <AlertTriangle className="h-4.5 w-4.5 text-warn" />
             </div>
             <div>
-              <p className="text-sm font-medium text-ink">
-                Extraction is temporarily unavailable
-              </p>
-              <p className="text-sm text-warn">
-                You can still upload files. Please try extracting again shortly.
-              </p>
+              <p className="text-sm font-medium text-ink">{w.unavailable.title}</p>
+              <p className="text-sm text-warn">{w.unavailable.body}</p>
             </div>
           </CardContent>
         </Card>
@@ -238,9 +229,7 @@ export default function WorkspacePage() {
           {rows.length > 0 && (
             <>
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-ink-2">
-                  {rows.length} file{rows.length > 1 ? "s" : ""} ready
-                </p>
+                <p className="text-sm font-medium text-ink-2">{w.filesReady(rows.length)}</p>
               </div>
               <FileQueueList rows={rows} onRemove={removeRow} />
               <div className="flex justify-end">
@@ -251,8 +240,8 @@ export default function WorkspacePage() {
                   disabled={!hasApiKey}
                 >
                   <Sparkles className="h-4 w-4" />
-                  Extract {rows.length} invoice{rows.length > 1 ? "s" : ""}
-                  <ArrowRight className="h-4 w-4" />
+                  {w.extractButton(rows.length)}
+                  <ArrowRight className="rtl:-scale-x-100 h-4 w-4" />
                 </Button>
               </div>
             </>
@@ -265,9 +254,7 @@ export default function WorkspacePage() {
           <Card>
             <CardContent className="p-6">
               <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="font-medium text-ink-2">
-                  Extracting invoice data…
-                </span>
+                <span className="font-medium text-ink-2">{w.extracting}</span>
                 <span className="tabular-nums text-ink-2">{progress}%</span>
               </div>
               <Progress value={progress} />
@@ -281,11 +268,9 @@ export default function WorkspacePage() {
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4 text-sm">
-              <span className="font-medium text-ink">
-                {successCount} extracted
-              </span>
+              <span className="font-medium text-ink">{w.extracted(successCount)}</span>
               {errorCount > 0 && (
-                <span className="font-medium text-bad">{errorCount} failed</span>
+                <span className="font-medium text-bad">{w.failed(errorCount)}</span>
               )}
             </div>
             <Button
@@ -295,7 +280,7 @@ export default function WorkspacePage() {
               disabled={exporting || successCount === 0}
             >
               <Download className="h-4 w-4" />
-              {exporting ? "Exporting…" : "Download Excel (.xlsx)"}
+              {exporting ? w.exporting : w.download}
             </Button>
           </div>
           <InvoiceReviewTable

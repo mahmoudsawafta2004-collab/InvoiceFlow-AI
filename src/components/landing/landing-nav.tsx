@@ -6,9 +6,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 
 export function LandingNav() {
+  const { t } = useI18n();
   const { scrollY } = useScroll();
   const [lifted, setLifted] = useState(false);
 
@@ -24,13 +27,16 @@ export function LandingNav() {
         lifted && "border-b border-line/70 bg-canvas/80 backdrop-blur-xl"
       )}
     >
+      {/* Wordmark at the start, controls at the end — the space between is
+          deliberately empty and must stay that way, not get filled in. */}
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Wordmark />
         <div className="flex items-center gap-1.5">
+          <LanguageSwitcher />
           <ThemeToggle />
           <Link href="/workspace">
             <Button variant="primary" size="sm">
-              Try it free
+              {t.landing.nav.tryFree}
             </Button>
           </Link>
         </div>

@@ -5,6 +5,7 @@ import { useDropzone, type FileRejection } from "react-dropzone";
 import { motion, AnimatePresence } from "motion/react";
 import { UploadCloud, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 const MAX_FILES = 50;
 const MAX_SIZE = 15 * 1024 * 1024; // 15MB per file
@@ -16,6 +17,8 @@ export function Dropzone({
   onFiles: (files: File[]) => void;
   disabled?: boolean;
 }) {
+  const { t } = useI18n();
+  const dz = t.dropzone;
   const [rejection, setRejection] = useState<string | null>(null);
 
   const onDrop = useCallback(
@@ -24,14 +27,14 @@ export function Dropzone({
       if (rejections.length > 0) {
         const has = (code: string) =>
           rejections.some((r) => r.errors.some((e) => e.code === code));
-        if (has("too-many-files")) setRejection(`You can upload up to ${MAX_FILES} files at once.`);
-        else if (has("file-too-large")) setRejection("Each file must be smaller than 15MB.");
-        else if (has("file-invalid-type")) setRejection("Only PDF files are supported.");
-        else setRejection("Some files could not be added.");
+        if (has("too-many-files")) setRejection(dz.errors.tooMany(MAX_FILES));
+        else if (has("file-too-large")) setRejection(dz.errors.tooBig);
+        else if (has("file-invalid-type")) setRejection(dz.errors.wrongType);
+        else setRejection(dz.errors.generic);
       }
       if (accepted.length > 0) onFiles(accepted);
     },
-    [onFiles]
+    [onFiles, dz]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -68,11 +71,9 @@ export function Dropzone({
         </motion.div>
 
         <p className="mt-4 text-sm font-medium text-ink">
-          {isDragActive ? "Drop to add them" : "Drag & drop invoice PDFs"}
+          {isDragActive ? dz.dragActive : dz.dragIdle}
         </p>
-        <p className="mt-1 text-[13px] text-ink-3">
-          or click to browse — up to {MAX_FILES} files, 15MB each
-        </p>
+        <p className="mt-1 text-[13px] text-ink-3">{dz.hint(MAX_FILES)}</p>
       </div>
 
       <AnimatePresence>

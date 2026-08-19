@@ -1,4 +1,4 @@
-# InvoiceFlow AI
+# InvoiceFlow
 
 Bulk Invoice PDF → Excel Converter. Upload up to 50 invoice PDFs, let AI extract
 the key fields, review and correct the results, then export a clean `.xlsx`
@@ -32,6 +32,10 @@ Get a free Gemini API key at https://aistudio.google.com/apikey.
 currencies, and a case with no VAT and no due date. Drop them onto the
 Convert page to see the full flow. `samples/README.md` lists the correct
 values for verifying extraction accuracy.
+
+`samples/international/` adds Arabic, French, German and Spanish invoices —
+non-English invoices need no configuration, and day-first dates, comma
+decimal separators and currencies named in words are all normalised.
 
 ## Documentation
 

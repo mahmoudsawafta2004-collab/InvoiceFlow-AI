@@ -7,7 +7,7 @@ import { ClosingCta } from "@/components/landing/closing-cta";
 import { LandingFooter } from "@/components/landing/landing-footer";
 
 export const metadata: Metadata = {
-  title: "InvoiceFlow AI — Bulk Invoice PDF to Excel Converter",
+  title: "InvoiceFlow — Bulk Invoice PDF to Excel Converter",
 };
 
 export default function LandingPage() {

@@ -50,6 +50,12 @@
   --tint-violet: 137 79 208;
   --tint-violet-soft: 245 238 253;
 
+  /* Light-to-dark blue spread reserved for headline emphasis — kept in the
+     accent hue rather than the categorical tints above, so headings read as
+     "the brand colour" and not as one more category. */
+  --heading-blue-from: 129 140 248;
+  --heading-blue-to: 55 48 163;
+
   --shadow-color: 22 22 40;
 }
 
@@ -90,6 +96,9 @@
   --tint-violet: 184 141 248;
   --tint-violet-soft: 42 28 60;
 
+  --heading-blue-from: 165 180 252;
+  --heading-blue-to: 99 91 255;
+
   --shadow-color: 0 0 0;
 }
 
@@ -129,6 +138,9 @@
   --color-tint-violet: rgb(var(--tint-violet));
   --color-tint-violet-soft: rgb(var(--tint-violet-soft));
 
+  --color-heading-blue-from: rgb(var(--heading-blue-from));
+  --color-heading-blue-to: rgb(var(--heading-blue-to));
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-display: var(--font-display);
@@ -157,6 +169,30 @@ body {
   color: rgb(var(--ink));
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   font-feature-settings: "cv05" 1;
+}
+
+/* Arabic routes to a font with real Arabic glyphs; Instrument Sans has none.
+   Scoped to [dir="rtl"] rather than :lang(ar) so it only loads/applies for
+   the locale that actually sets dir, keeping Latin locales unaffected. */
+html[dir="rtl"] body {
+  font-family: var(--font-sans-ar), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* The display italic accent has no Arabic counterpart in Instrument Serif —
+   drop the italic and let the Arabic sans carry the emphasis on its own. */
+html[dir="rtl"] .font-display {
+  font-family: var(--font-sans-ar), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* Numeric and code fragments (invoice figures, the mock browser URL) should
+   stay LTR even inside an RTL page — mixed digits and punctuation reorder
+   unreadably otherwise. */
+html[dir="rtl"] .font-mono,
+html[dir="rtl"] .tabular {
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 /* Numbers must line up in financial tables. */

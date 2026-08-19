@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn, formatFileSize } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 const numericFields: FieldKey[] = ["subtotal", "tax", "total"];
 
@@ -24,15 +25,17 @@ export function InvoiceReviewTable({
   onRemoveRow: (rowId: string) => void;
   onRetryRow: (rowId: string) => void;
 }) {
+  const { t } = useI18n();
+  const rt = t.reviewTable;
   const columns: { key: FieldKey; label: string; align: "left" | "right" }[] = [
-    { key: "supplierName", label: "Supplier", align: "left" },
-    { key: "invoiceNumber", label: "Invoice #", align: "left" },
-    { key: "invoiceDate", label: "Invoice Date", align: "left" },
-    { key: "dueDate", label: "Due Date", align: "left" },
-    { key: "currency", label: "Currency", align: "left" },
-    { key: "subtotal", label: "Subtotal", align: "right" },
-    { key: "tax", label: "VAT / Tax", align: "right" },
-    { key: "total", label: "Total", align: "right" },
+    { key: "supplierName", label: rt.columns.supplier, align: "left" },
+    { key: "invoiceNumber", label: rt.columns.invoiceNumber, align: "left" },
+    { key: "invoiceDate", label: rt.columns.invoiceDate, align: "left" },
+    { key: "dueDate", label: rt.columns.dueDate, align: "left" },
+    { key: "currency", label: rt.columns.currency, align: "left" },
+    { key: "subtotal", label: rt.columns.subtotal, align: "right" },
+    { key: "tax", label: rt.columns.tax, align: "right" },
+    { key: "total", label: rt.columns.total, align: "right" },
   ];
 
   return (
@@ -79,7 +82,7 @@ export function InvoiceReviewTable({
                     >
                       <div className="flex items-center gap-2 text-[13px] text-ink-2">
                         <Loader2 className="h-4 w-4 shrink-0 animate-spin text-accent" />
-                        Retrying extraction…
+                        {rt.retrying}
                       </div>
                     </td>
                   </tr>
@@ -103,14 +106,14 @@ export function InvoiceReviewTable({
                     >
                       <div className="flex items-center gap-2 text-sm text-bad">
                         <AlertCircle className="h-4 w-4 shrink-0" />
-                        {row.error || "Extraction failed."}
+                        {row.error || rt.extractionFailedFallback}
                       </div>
                     </td>
                     <td className="px-2 py-3 align-top">
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => onRetryRow(row.id)}
-                          title="Retry extraction"
+                          title={rt.retry}
                           className="rounded-md p-1.5 text-ink-3 transition-colors hover:bg-surface-3 hover:text-accent"
                         >
                           <RotateCw className="h-4 w-4" />
@@ -180,9 +183,7 @@ export function InvoiceReviewTable({
                                   />
                                 </span>
                               </TooltipTrigger>
-                              <TooltipContent>
-                                AI confidence — click the value to correct it
-                              </TooltipContent>
+                              <TooltipContent>{rt.confidenceTooltip}</TooltipContent>
                             </Tooltip>
                           )}
                         </div>

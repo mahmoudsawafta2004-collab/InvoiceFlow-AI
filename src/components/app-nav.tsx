@@ -8,35 +8,38 @@ import { Menu, X, FileUp, LayoutDashboard, History, ArrowUpRight } from "lucide-
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/wordmark";
 import { ThemeToggle } from "@/components/theme-toggle";
-
-const links = [
-  {
-    href: "/workspace",
-    label: "Convert",
-    hint: "Upload invoices and export",
-    icon: FileUp,
-    tint: "text-tint-iris bg-tint-iris-soft",
-  },
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    hint: "Totals across your batches",
-    icon: LayoutDashboard,
-    tint: "text-tint-teal bg-tint-teal-soft",
-  },
-  {
-    href: "/history",
-    label: "History",
-    hint: "Re-download past exports",
-    icon: History,
-    tint: "text-tint-violet bg-tint-violet-soft",
-  },
-];
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useI18n } from "@/lib/i18n/context";
 
 export function AppNav() {
   const pathname = usePathname();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  const links = [
+    {
+      href: "/workspace",
+      label: t.nav.convert,
+      hint: t.nav.convertHint,
+      icon: FileUp,
+      tint: "text-tint-iris bg-tint-iris-soft",
+    },
+    {
+      href: "/dashboard",
+      label: t.nav.dashboard,
+      hint: t.nav.dashboardHint,
+      icon: LayoutDashboard,
+      tint: "text-tint-teal bg-tint-teal-soft",
+    },
+    {
+      href: "/history",
+      label: t.nav.history,
+      hint: t.nav.historyHint,
+      icon: History,
+      tint: "text-tint-violet bg-tint-violet-soft",
+    },
+  ];
 
   // Close on Escape and on any click outside the panel.
   useEffect(() => {
@@ -76,12 +79,13 @@ export function AppNav() {
         </div>
 
         <div className="flex items-center gap-1" ref={panelRef}>
+          <LanguageSwitcher />
           <ThemeToggle />
 
           <div className="relative">
             <button
               onClick={() => setOpen((v) => !v)}
-              aria-label="Menu"
+              aria-label={t.nav.menu}
               aria-expanded={open}
               className={cn(
                 "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
@@ -109,7 +113,7 @@ export function AppNav() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -6, scale: 0.97 }}
                   transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute right-0 top-11 w-72 origin-top-right overflow-hidden rounded-xl border border-line bg-surface p-1.5 shadow-float"
+                  className="absolute end-0 top-11 w-72 overflow-hidden rounded-xl border border-line bg-surface p-1.5 shadow-float"
                 >
                   {links.map((link) => {
                     const active = pathname === link.href;
@@ -142,7 +146,7 @@ export function AppNav() {
                             {link.hint}
                           </span>
                         </span>
-                        <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-ink-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                        <ArrowUpRight className="h-3.5 w-3.5 shrink-0 rtl:-scale-x-100 text-ink-3 opacity-0 transition-opacity group-hover:opacity-100" />
                       </Link>
                     );
                   })}
@@ -154,9 +158,9 @@ export function AppNav() {
                     className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-[13px] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
                   >
                     <span className="flex h-8 w-8 items-center justify-center">
-                      <ArrowUpRight className="h-4 w-4" />
+                      <ArrowUpRight className="h-4 w-4 rtl:-scale-x-100" />
                     </span>
-                    Back to home
+                    {t.nav.backToHome}
                   </Link>
                 </motion.nav>
               )}

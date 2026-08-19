@@ -1,4 +1,4 @@
-# InvoiceFlow AI — Owner's Documentation
+# InvoiceFlow — Owner's Documentation
 
 Everything you need to run, deploy, customize, and operate this product.
 
@@ -6,7 +6,7 @@ Everything you need to run, deploy, customize, and operate this product.
 
 ## 1. What this product does
 
-InvoiceFlow AI converts batches of invoice PDFs into a structured Excel file.
+InvoiceFlow converts batches of invoice PDFs into a structured Excel file.
 
 1. The user drops up to 50 invoice PDFs onto the page.
 2. Each PDF is sent to Google Gemini, which returns eight structured fields
@@ -223,6 +223,21 @@ Worth knowing before promising anything to a customer.
 - **Rate limits.** On a free-tier key, large batches can hit Gemini's
   requests-per-minute cap. Affected invoices show a rate-limit message and can
   be retried.
+- **Interface language.** The UI is English only. Invoice language is not a
+  constraint — see below — but the buttons and labels are not translated.
+
+### Invoice languages
+
+Non-English invoices work with no configuration. Verified against Arabic,
+French, German and Spanish samples in `samples/international/`, where all 32
+fields extracted correctly, including day-first dates (`12/06/2026` →
+`2026-06-12`), comma decimal separators (`1.245,00` → `1245`), and a currency
+named only in words ("دينار أردني" → `JOD`).
+
+Adding a language needs no code. If a specific market matters, the one thing
+worth tuning is the date guidance in `PROMPT` inside
+`src/app/api/extract/route.ts`, since ambiguous dates like `03/04/2026` can
+only be resolved by convention.
 
 ---
 

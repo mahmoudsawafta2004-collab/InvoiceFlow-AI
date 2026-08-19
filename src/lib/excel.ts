@@ -3,7 +3,7 @@ import type { InvoiceRow } from "./types";
 
 export async function buildInvoiceWorkbook(rows: InvoiceRow[]): Promise<Blob> {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "InvoiceFlow AI";
+  workbook.creator = "InvoiceFlow";
   workbook.created = new Date();
 
   const sheet = workbook.addWorksheet("Invoices", {

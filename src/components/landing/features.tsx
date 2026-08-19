@@ -4,74 +4,58 @@ import { motion } from "motion/react";
 import { Gauge, Layers, ShieldCheck, Table2, Coins } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion-primitives";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
-const features = [
-  {
-    icon: Gauge,
-    title: "Confidence on every field",
-    body: "The extractor reports how sure it is, field by field. Anything uncertain is flagged in amber so you review the three values that matter instead of re-checking all forty.",
-    span: "lg:col-span-3",
-    tint: "text-tint-iris bg-tint-iris-soft",
-    glow: "rgb(var(--tint-iris) / 0.12)",
-  },
-  {
-    icon: Layers,
-    title: "Batches, not one-offs",
-    body: "Up to 50 invoices per run, processed in parallel with a live progress read-out.",
-    span: "lg:col-span-3",
-    tint: "text-tint-teal bg-tint-teal-soft",
-    glow: "rgb(var(--tint-teal) / 0.12)",
-  },
-  {
-    icon: Table2,
-    title: "Excel that's actually usable",
-    body: "Typed number columns, frozen headers, filters and a totals row with live formulas.",
-    span: "lg:col-span-2",
-    tint: "text-tint-violet bg-tint-violet-soft",
-    glow: "rgb(var(--tint-violet) / 0.12)",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Nothing stored",
-    body: "Invoices are held in memory only long enough to read them. No database, no files at rest.",
-    span: "lg:col-span-2",
-    tint: "text-tint-rose bg-tint-rose-soft",
-    glow: "rgb(var(--tint-rose) / 0.12)",
-  },
-  {
-    icon: Coins,
-    title: "Mixed currencies",
-    body: "Reads EUR, GBP, USD, JOD, AED and more — inferred from symbols when unlabelled.",
-    span: "lg:col-span-2",
-    tint: "text-tint-amber bg-tint-amber-soft",
-    glow: "rgb(var(--tint-amber) / 0.12)",
-  },
+const icons = [Gauge, Layers, Table2, ShieldCheck, Coins];
+const spans = ["lg:col-span-3", "lg:col-span-3", "lg:col-span-2", "lg:col-span-2", "lg:col-span-2"];
+const tints = [
+  "text-tint-iris bg-tint-iris-soft",
+  "text-tint-teal bg-tint-teal-soft",
+  "text-tint-violet bg-tint-violet-soft",
+  "text-tint-rose bg-tint-rose-soft",
+  "text-tint-amber bg-tint-amber-soft",
+];
+const glows = [
+  "rgb(var(--tint-iris) / 0.12)",
+  "rgb(var(--tint-teal) / 0.12)",
+  "rgb(var(--tint-violet) / 0.12)",
+  "rgb(var(--tint-rose) / 0.12)",
+  "rgb(var(--tint-amber) / 0.12)",
 ];
 
 export function Features() {
+  const { t } = useI18n();
+  const h = t.landing.features;
+
   return (
     <section className="border-t border-line py-24">
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="mx-auto max-w-xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-tint-rose">
-            Why teams keep it
+          {/* Headings stay in the brand blue rather than each section
+              claiming its own hue — the categorical tints below are reserved
+              for labelling the five feature cards, not for headline colour. */}
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+            {h.kicker}
           </p>
           <h2 className="mt-3 text-balance-pretty text-3xl font-semibold tracking-[-0.03em] text-ink sm:text-4xl">
-            Built around the part that actually{" "}
-            <span className="font-display italic font-normal text-tint-rose">
-              takes time
+            {h.titleStart}{" "}
+            <span className="font-display italic font-normal bg-gradient-to-r from-heading-blue-from to-heading-blue-to bg-clip-text text-transparent">
+              {h.titleAccent}
             </span>
           </h2>
-          <p className="mt-4 text-balance-pretty text-ink-2">
-            Reading an invoice is quick. Typing forty of them into a spreadsheet is
-            not. That is the only problem this solves, and it solves it properly.
-          </p>
+          <p className="mt-4 text-balance-pretty text-ink-2">{h.sub}</p>
         </Reveal>
 
         <RevealGroup className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-          {features.map((f) => (
-            <RevealItem key={f.title} className={cn(f.span)}>
-              <FeatureCard {...f} />
+          {h.cards.map((card, i) => (
+            <RevealItem key={card.title} className={cn(spans[i])}>
+              <FeatureCard
+                icon={icons[i]}
+                title={card.title}
+                body={card.body}
+                tint={tints[i]}
+                glow={glows[i]}
+              />
             </RevealItem>
           ))}
         </RevealGroup>

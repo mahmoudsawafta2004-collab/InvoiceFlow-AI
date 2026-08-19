@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useHistory } from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 function average(values: number[]): number {
   if (values.length === 0) return 0;
@@ -20,6 +21,8 @@ function average(values: number[]): number {
 }
 
 export default function DashboardPage() {
+  const { t } = useI18n();
+  const d = t.dashboard;
   const batches = useHistory();
 
   const totalInvoices = batches.reduce((sum, b) => sum + b.rowCount, 0);
@@ -37,22 +40,22 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      label: "Total invoices processed",
+      label: d.stats.totalInvoices,
       value: totalInvoices.toLocaleString(),
       icon: FileText,
     },
     {
-      label: "Batches run",
+      label: d.stats.batchesRun,
       value: batches.length.toLocaleString(),
       icon: Layers,
     },
     {
-      label: "Success rate",
+      label: d.stats.successRate,
       value: totalInvoices > 0 ? `${successRate}%` : "—",
       icon: CheckCircle2,
     },
     {
-      label: "Avg. confidence",
+      label: d.stats.avgConfidence,
       value: confidences.length > 0 ? `${avgConfidence}%` : "—",
       icon: Gauge,
     },
@@ -62,17 +65,13 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">
-            Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-ink-2">
-            An overview of your invoice processing activity.
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">{d.title}</h1>
+          <p className="mt-1 text-sm text-ink-2">{d.subtitle}</p>
         </div>
         <Link href="/workspace">
           <Button variant="primary" size="sm">
-            New batch
-            <ArrowRight className="h-3.5 w-3.5" />
+            {d.newBatch}
+            <ArrowRight className="rtl:-scale-x-100 h-3.5 w-3.5" />
           </Button>
         </Link>
       </div>
@@ -95,24 +94,20 @@ export default function DashboardPage() {
 
       <div className="mt-10">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-ink">Recent batches</h2>
+          <h2 className="text-base font-semibold text-ink">{d.recentBatches}</h2>
           <Link href="/history" className="text-sm font-medium text-accent hover:text-accent">
-            View all
+            {d.viewAll}
           </Link>
         </div>
 
         {batches.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-              <p className="text-sm font-medium text-ink">
-                No activity yet
-              </p>
-              <p className="max-w-xs text-sm text-ink-2">
-                Run your first batch to see stats and history here.
-              </p>
+              <p className="text-sm font-medium text-ink">{d.empty.title}</p>
+              <p className="max-w-xs text-sm text-ink-2">{d.empty.body}</p>
               <Link href="/workspace">
                 <Button variant="primary" size="sm" className="mt-2">
-                  Convert invoices
+                  {d.empty.cta}
                 </Button>
               </Link>
             </CardContent>
@@ -128,17 +123,17 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-ink">
-                        Batch #{batch.id.slice(0, 8)}
+                        {d.batchLabel(batch.id.slice(0, 8))}
                       </p>
                       <p className="text-xs text-ink-2">
-                        {formatDate(batch.createdAt)} · {batch.rowCount} invoices
+                        {formatDate(batch.createdAt)} · {d.invoicesCount(batch.rowCount)}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Badge variant="success">{batch.successCount} ok</Badge>
+                    <Badge variant="success">{d.ok(batch.successCount)}</Badge>
                     {batch.errorCount > 0 && (
-                      <Badge variant="destructive">{batch.errorCount} failed</Badge>
+                      <Badge variant="destructive">{d.failedCount(batch.errorCount)}</Badge>
                     )}
                   </div>
                 </CardContent>

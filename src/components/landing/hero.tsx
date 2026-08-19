@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExtractionPreview } from "@/components/landing/extraction-preview";
 import { EASE } from "@/components/motion-primitives";
+import { useI18n } from "@/lib/i18n/context";
 
 const line = {
   hidden: { opacity: 0, y: 18 },
@@ -17,6 +18,9 @@ const line = {
 };
 
 export function Hero() {
+  const { t } = useI18n();
+  const h = t.landing.hero;
+
   return (
     <section className="relative overflow-hidden">
       {/* Ambient light. Two offset pools read as depth; one centred glow reads as a template. */}
@@ -48,10 +52,10 @@ export function Hero() {
           {/* An editorial kicker rather than a pill badge — the bordered capsule
               with an icon is the stock landing-page motif, and reads as one. */}
           <motion.div variants={line} custom={0} initial="hidden" animate="show">
-            <span className="inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-tint-teal">
-              <span aria-hidden className="hidden h-px w-10 bg-tint-teal/35 sm:block" />
-              Made for the last week of the month
-              <span aria-hidden className="hidden h-px w-10 bg-tint-teal/35 sm:block" />
+            <span className="inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+              <span aria-hidden className="hidden h-px w-10 bg-accent/35 sm:block" />
+              {h.kicker}
+              <span aria-hidden className="hidden h-px w-10 bg-accent/35 sm:block" />
             </span>
           </motion.div>
 
@@ -62,12 +66,12 @@ export function Hero() {
             animate="show"
             className="mt-6 text-balance-pretty text-[2.6rem] font-semibold leading-[1.06] tracking-[-0.035em] text-ink sm:text-6xl"
           >
-            Fifty invoice PDFs in.
+            {h.headline1}
             <br />
-            <span className="font-display italic font-normal bg-gradient-to-r from-tint-iris via-tint-violet to-tint-rose bg-clip-text pr-2 text-transparent">
-              One clean spreadsheet
+            <span className="font-display italic font-normal bg-gradient-to-r from-heading-blue-from to-heading-blue-to bg-clip-text text-transparent">
+              {h.headlineAccent}
             </span>
-            out.
+            {h.headlineEnd}
           </motion.h1>
 
           <motion.p
@@ -77,9 +81,7 @@ export function Hero() {
             animate="show"
             className="mx-auto mt-6 max-w-xl text-balance-pretty text-[17px] leading-relaxed text-ink-2"
           >
-            Drop a stack of invoices and get every supplier, date, tax figure and
-            total extracted into Excel — with a confidence score on each field so
-            you know exactly what to double-check.
+            {h.sub}
           </motion.p>
 
           <motion.div
@@ -91,13 +93,13 @@ export function Hero() {
           >
             <Link href="/workspace" className="w-full sm:w-auto">
               <Button variant="primary" size="lg" className="group w-full sm:w-auto">
-                Convert your first batch
-                <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
+                {h.ctaPrimary}
+                <ArrowRight className="rtl:-scale-x-100 transition-transform duration-200 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
               </Button>
             </Link>
             <Link href="/workspace" className="w-full sm:w-auto">
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                See it work
+                {h.ctaSecondary}
               </Button>
             </Link>
           </motion.div>
@@ -109,7 +111,7 @@ export function Hero() {
             animate="show"
             className="mt-4 text-[13px] text-ink-3"
           >
-            No sign-up · No credit card · A full batch of 50 in about 3 minutes
+            {h.note}
           </motion.p>
         </div>
 
