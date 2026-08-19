@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExtractionPreview } from "@/components/landing/extraction-preview";
 import { EASE } from "@/components/motion-primitives";
@@ -47,11 +47,8 @@ export function Hero() {
         <div className="mx-auto max-w-3xl text-center">
           <motion.div variants={line} custom={0} initial="hidden" animate="show">
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3 py-1 text-xs font-medium text-ink-2 backdrop-blur">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ok opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-ok" />
-              </span>
-              Built for accountants and finance teams
+              <CalendarClock className="h-3.5 w-3.5 text-tint-teal" />
+              Made for the last week of the month
             </span>
           </motion.div>
 
