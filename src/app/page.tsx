@@ -10,13 +10,9 @@ export const metadata: Metadata = {
   title: "InvoiceFlow AI — Bulk Invoice PDF to Excel Converter",
 };
 
-/**
- * The marketing page is committed to dark regardless of the app theme, so it
- * reads as a designed surface rather than a themed one.
- */
 export default function LandingPage() {
   return (
-    <div className="dark bg-canvas text-ink">
+    <div className="bg-canvas text-ink">
       <LandingNav />
       <main>
         <Hero />

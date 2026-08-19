@@ -36,6 +36,20 @@
   --bad: 216 46 46;
   --bad-soft: 253 236 236;
 
+
+  /* Categorical tints. Used to distinguish steps and feature groups —
+     never decoratively, so colour always carries meaning. */
+  --tint-iris: 91 91 214;
+  --tint-iris-soft: 238 238 252;
+  --tint-teal: 13 148 136;
+  --tint-teal-soft: 224 246 244;
+  --tint-amber: 190 116 12;
+  --tint-amber-soft: 253 244 227;
+  --tint-rose: 205 61 106;
+  --tint-rose-soft: 253 238 243;
+  --tint-violet: 137 79 208;
+  --tint-violet-soft: 245 238 253;
+
   --shadow-color: 22 22 40;
 }
 
@@ -63,6 +77,18 @@
   --warn-soft: 46 34 14;
   --bad: 248 113 113;
   --bad-soft: 48 20 20;
+
+
+  --tint-iris: 141 141 246;
+  --tint-iris-soft: 34 34 60;
+  --tint-teal: 45 200 184;
+  --tint-teal-soft: 12 44 42;
+  --tint-amber: 233 168 62;
+  --tint-amber-soft: 48 36 14;
+  --tint-rose: 244 122 160;
+  --tint-rose-soft: 52 22 33;
+  --tint-violet: 184 141 248;
+  --tint-violet-soft: 42 28 60;
 
   --shadow-color: 0 0 0;
 }
@@ -92,8 +118,20 @@
   --color-bad: rgb(var(--bad));
   --color-bad-soft: rgb(var(--bad-soft));
 
+  --color-tint-iris: rgb(var(--tint-iris));
+  --color-tint-iris-soft: rgb(var(--tint-iris-soft));
+  --color-tint-teal: rgb(var(--tint-teal));
+  --color-tint-teal-soft: rgb(var(--tint-teal-soft));
+  --color-tint-amber: rgb(var(--tint-amber));
+  --color-tint-amber-soft: rgb(var(--tint-amber-soft));
+  --color-tint-rose: rgb(var(--tint-rose));
+  --color-tint-rose-soft: rgb(var(--tint-rose-soft));
+  --color-tint-violet: rgb(var(--tint-violet));
+  --color-tint-violet-soft: rgb(var(--tint-violet-soft));
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
 }
 
 /* Layered shadows read as real depth; a single blur reads as a sticker. */

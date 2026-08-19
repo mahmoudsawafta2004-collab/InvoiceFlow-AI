@@ -25,7 +25,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-x-0 -top-40 h-[560px]"
         style={{
           background:
-            "radial-gradient(52% 60% at 30% 0%, rgb(var(--accent) / 0.20), transparent 70%), radial-gradient(40% 50% at 78% 12%, rgb(var(--accent) / 0.12), transparent 72%)",
+            "radial-gradient(46% 55% at 22% 0%, rgb(var(--tint-iris) / 0.16), transparent 70%), radial-gradient(40% 50% at 62% 6%, rgb(var(--tint-teal) / 0.13), transparent 72%), radial-gradient(38% 48% at 88% 16%, rgb(var(--tint-rose) / 0.11), transparent 72%)",
         }}
       />
       {/* A faint grid grounds the glow so it doesn't float. */}
@@ -64,9 +64,9 @@ export function Hero() {
           >
             Fifty invoice PDFs in.
             <br />
-            <span className="bg-gradient-to-br from-accent via-accent-hover to-accent bg-clip-text text-transparent">
+            <span className="font-display italic font-normal bg-gradient-to-r from-tint-iris via-tint-violet to-tint-rose bg-clip-text pr-2 text-transparent">
               One clean spreadsheet
-            </span>{" "}
+            </span>
             out.
           </motion.h1>
 

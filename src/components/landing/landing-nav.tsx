@@ -5,6 +5,7 @@ import { motion, useScroll, useMotionValueEvent } from "motion/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 export function LandingNav() {
@@ -25,12 +26,8 @@ export function LandingNav() {
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Wordmark />
-        <div className="flex items-center gap-2">
-          <Link href="/workspace" className="hidden sm:block">
-            <Button variant="ghost" size="sm">
-              Open the app
-            </Button>
-          </Link>
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
           <Link href="/workspace">
             <Button variant="primary" size="sm">
               Try it free
