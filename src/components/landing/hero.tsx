@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowRight, CalendarClock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExtractionPreview } from "@/components/landing/extraction-preview";
 import { EASE } from "@/components/motion-primitives";
@@ -45,10 +45,13 @@ export function Hero() {
 
       <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-20 sm:pt-28">
         <div className="mx-auto max-w-3xl text-center">
+          {/* An editorial kicker rather than a pill badge — the bordered capsule
+              with an icon is the stock landing-page motif, and reads as one. */}
           <motion.div variants={line} custom={0} initial="hidden" animate="show">
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3 py-1 text-xs font-medium text-ink-2 backdrop-blur">
-              <CalendarClock className="h-3.5 w-3.5 text-tint-teal" />
+            <span className="inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-tint-teal">
+              <span aria-hidden className="hidden h-px w-10 bg-tint-teal/35 sm:block" />
               Made for the last week of the month
+              <span aria-hidden className="hidden h-px w-10 bg-tint-teal/35 sm:block" />
             </span>
           </motion.div>
 
