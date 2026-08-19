@@ -11,15 +11,18 @@ const Progress = React.forwardRef<
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(
-      "relative h-2 w-full overflow-hidden rounded-full bg-neutral-100",
+      "relative h-1.5 w-full overflow-hidden rounded-full bg-surface-3",
       className
     )}
     {...props}
   >
     <ProgressPrimitive.Indicator
-      className="h-full w-full flex-1 bg-indigo-600 transition-transform duration-500 ease-out"
+      className="relative h-full w-full flex-1 rounded-full bg-accent transition-transform duration-700 ease-out"
       style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-    />
+    >
+      {/* A travelling highlight makes a slow batch feel alive rather than stuck. */}
+      <span className="absolute inset-0 -translate-x-full animate-[shimmer_1.8s_infinite] bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+    </ProgressPrimitive.Indicator>
   </ProgressPrimitive.Root>
 ));
 Progress.displayName = ProgressPrimitive.Root.displayName;

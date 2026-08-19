@@ -195,10 +195,10 @@ export default function WorkspacePage() {
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
             Convert Invoices
           </h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-ink-2">
             Upload, extract, review, and export — all in one place.
           </p>
         </div>
@@ -215,16 +215,16 @@ export default function WorkspacePage() {
       </div>
 
       {extractionUnavailable && (
-        <Card className="mb-6 border-amber-200 bg-amber-50">
+        <Card className="mb-6 border-warn/30 bg-warn-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100">
-              <AlertTriangle className="h-4.5 w-4.5 text-amber-700" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-warn-soft">
+              <AlertTriangle className="h-4.5 w-4.5 text-warn" />
             </div>
             <div>
-              <p className="text-sm font-medium text-amber-900">
+              <p className="text-sm font-medium text-ink">
                 Extraction is temporarily unavailable
               </p>
-              <p className="text-sm text-amber-700">
+              <p className="text-sm text-warn">
                 You can still upload files. Please try extracting again shortly.
               </p>
             </div>
@@ -238,7 +238,7 @@ export default function WorkspacePage() {
           {rows.length > 0 && (
             <>
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-neutral-700">
+                <p className="text-sm font-medium text-ink-2">
                   {rows.length} file{rows.length > 1 ? "s" : ""} ready
                 </p>
               </div>
@@ -265,10 +265,10 @@ export default function WorkspacePage() {
           <Card>
             <CardContent className="p-6">
               <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="font-medium text-neutral-700">
+                <span className="font-medium text-ink-2">
                   Extracting invoice data…
                 </span>
-                <span className="tabular-nums text-neutral-500">{progress}%</span>
+                <span className="tabular-nums text-ink-2">{progress}%</span>
               </div>
               <Progress value={progress} />
             </CardContent>
@@ -281,11 +281,11 @@ export default function WorkspacePage() {
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4 text-sm">
-              <span className="font-medium text-neutral-900">
+              <span className="font-medium text-ink">
                 {successCount} extracted
               </span>
               {errorCount > 0 && (
-                <span className="font-medium text-red-600">{errorCount} failed</span>
+                <span className="font-medium text-bad">{errorCount} failed</span>
               )}
             </div>
             <Button

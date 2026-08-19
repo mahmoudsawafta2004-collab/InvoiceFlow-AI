@@ -38,8 +38,8 @@ export function EditableCell({
           }
         }}
         className={cn(
-          "w-full rounded-md border border-indigo-300 bg-white px-2 py-1 text-sm shadow-sm outline-none ring-2 ring-indigo-100",
-          align === "right" && "text-right"
+          "w-full rounded-md border border-accent bg-surface px-2 py-1 text-[13px] text-ink outline-none ring-2 ring-accent-soft",
+          align === "right" && "text-right tabular"
         )}
       />
     );
@@ -54,11 +54,11 @@ export function EditableCell({
         setEditing(true);
       }}
       className={cn(
-        "block w-full truncate whitespace-nowrap rounded-md px-2 py-1 text-sm hover:bg-neutral-100",
-        align === "right" ? "text-right tabular-nums" : "text-left"
+        "block w-full truncate whitespace-nowrap rounded-md px-2 py-1 text-[13px] text-ink transition-colors hover:bg-surface-3",
+        align === "right" ? "text-right tabular font-mono text-[12px]" : "text-left"
       )}
     >
-      {value || <span className="text-neutral-300">—</span>}
+      {value || <span className="text-ink-3">—</span>}
     </button>
   );
 }

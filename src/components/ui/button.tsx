@@ -4,23 +4,31 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-neutral-900",
+  [
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium",
+    "transition-[background-color,border-color,color,box-shadow,transform] duration-150",
+    "active:scale-[0.985]",
+    "disabled:pointer-events-none disabled:opacity-45",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  ].join(" "),
   {
     variants: {
       variant: {
-        default: "bg-neutral-900 text-white hover:bg-neutral-800",
-        primary: "bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm shadow-indigo-600/20",
+        default:
+          "bg-ink text-canvas hover:bg-ink/90",
+        primary:
+          "bg-accent text-accent-ink hover:bg-accent-hover shadow-raise",
         outline:
-          "border border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-50",
-        ghost: "text-neutral-700 hover:bg-neutral-100",
-        subtle: "bg-neutral-100 text-neutral-900 hover:bg-neutral-200",
-        destructive: "bg-red-600 text-white hover:bg-red-500",
-        link: "text-indigo-600 underline-offset-4 hover:underline",
+          "border border-line bg-surface text-ink hover:border-line-strong hover:bg-surface-2",
+        ghost: "text-ink-2 hover:bg-surface-3 hover:text-ink",
+        subtle: "bg-surface-3 text-ink hover:bg-line",
+        destructive: "bg-bad text-white hover:brightness-110",
+        link: "text-accent underline-offset-4 hover:underline",
       },
       size: {
-        sm: "h-8 px-3 text-xs",
-        default: "h-10 px-4",
-        lg: "h-11 px-6 text-base",
+        sm: "h-8 px-3 text-[13px]",
+        default: "h-10 px-4 text-sm",
+        lg: "h-11 px-6 text-[15px]",
         icon: "h-9 w-9",
       },
     },

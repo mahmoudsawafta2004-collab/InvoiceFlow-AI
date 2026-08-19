@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,21 +23,27 @@ export function StepIndicator({
         const isCurrent = i === currentIndex;
         return (
           <li key={step.key} className="flex min-w-0 flex-1 items-center last:flex-none">
-            <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
-              <div
+            <div className="flex min-w-0 items-center gap-2.5">
+              <motion.div
+                animate={
+                  isCurrent
+                    ? { scale: [1, 1.06, 1] }
+                    : { scale: 1 }
+                }
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                 className={cn(
-                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors",
-                  isDone && "bg-indigo-600 text-white",
-                  isCurrent && "bg-indigo-600 text-white ring-4 ring-indigo-100",
-                  !isDone && !isCurrent && "bg-neutral-100 text-neutral-400"
+                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-semibold transition-colors duration-300",
+                  isDone && "bg-accent text-accent-ink",
+                  isCurrent && "bg-accent text-accent-ink ring-4 ring-accent-soft",
+                  !isDone && !isCurrent && "bg-surface-3 text-ink-3"
                 )}
               >
-                {isDone ? <Check className="h-3.5 w-3.5" /> : i + 1}
-              </div>
+                {isDone ? <Check className="h-3 w-3" /> : i + 1}
+              </motion.div>
               <span
                 className={cn(
-                  "truncate text-sm font-medium",
-                  isCurrent ? "text-neutral-900" : isDone ? "text-neutral-600" : "text-neutral-400",
+                  "truncate text-[13px] font-medium transition-colors duration-300",
+                  isCurrent ? "text-ink" : isDone ? "text-ink-2" : "text-ink-3",
                   !isCurrent && "hidden sm:inline"
                 )}
               >
@@ -42,12 +51,14 @@ export function StepIndicator({
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div
-                className={cn(
-                  "mx-2 h-px min-w-4 flex-1 transition-colors sm:mx-3",
-                  isDone ? "bg-indigo-600" : "bg-neutral-200"
-                )}
-              />
+              <div className="relative mx-3 h-px min-w-4 flex-1 bg-line">
+                <motion.div
+                  className="absolute inset-y-0 left-0 bg-accent"
+                  initial={false}
+                  animate={{ width: isDone ? "100%" : "0%" }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </div>
             )}
           </li>
         );

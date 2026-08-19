@@ -62,10 +62,10 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
             Dashboard
           </h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-ink-2">
             An overview of your invoice processing activity.
           </p>
         </div>
@@ -82,10 +82,10 @@ export default function DashboardPage() {
           <Card key={stat.label}>
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-neutral-500">{stat.label}</p>
-                <stat.icon className="h-4 w-4 text-neutral-400" />
+                <p className="text-sm text-ink-2">{stat.label}</p>
+                <stat.icon className="h-4 w-4 text-ink-3" />
               </div>
-              <p className="mt-2 text-2xl font-semibold text-neutral-900">
+              <p className="mt-2 text-2xl font-semibold text-ink">
                 {stat.value}
               </p>
             </CardContent>
@@ -95,8 +95,8 @@ export default function DashboardPage() {
 
       <div className="mt-10">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-neutral-900">Recent batches</h2>
-          <Link href="/history" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+          <h2 className="text-base font-semibold text-ink">Recent batches</h2>
+          <Link href="/history" className="text-sm font-medium text-accent hover:text-accent">
             View all
           </Link>
         </div>
@@ -104,10 +104,10 @@ export default function DashboardPage() {
         {batches.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-              <p className="text-sm font-medium text-neutral-900">
+              <p className="text-sm font-medium text-ink">
                 No activity yet
               </p>
-              <p className="max-w-xs text-sm text-neutral-500">
+              <p className="max-w-xs text-sm text-ink-2">
                 Run your first batch to see stats and history here.
               </p>
               <Link href="/workspace">
@@ -123,14 +123,14 @@ export default function DashboardPage() {
               <Card key={batch.id}>
                 <CardContent className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50">
-                      <FileText className="h-4 w-4 text-indigo-600" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                      <FileText className="h-4 w-4 text-accent" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-neutral-900">
+                      <p className="text-sm font-medium text-ink">
                         Batch #{batch.id.slice(0, 8)}
                       </p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-ink-2">
                         {formatDate(batch.createdAt)} · {batch.rowCount} invoices
                       </p>
                     </div>
