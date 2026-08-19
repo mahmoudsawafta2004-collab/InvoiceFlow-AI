@@ -109,6 +109,9 @@ src/
     confidence-badge.tsx  Colour-coded confidence indicator
     step-indicator.tsx    Upload → Extraction → Review progress header
     navbar.tsx, footer.tsx
+    landing/pricing.tsx    Pricing cards, reading live plans
+    auth/                  Sign-in, sign-up, forgot/update-password forms
+    admin/                 Plan editor, subscriber table
   lib/
     types.ts              Shared types, including the field list
     excel.ts              .xlsx generation via ExcelJS
@@ -117,6 +120,14 @@ src/
     use-server-key.ts     Reads /api/config so the UI knows extraction is live
     pool.ts               Bounded-concurrency runner
     utils.ts              Formatting helpers and `cn`
+    auth.ts               Server-side: current user, admin check, usage/plan lookup
+    admin.ts              Server-side: data for the admin dashboard
+    stripe.ts              Lazy Stripe client
+    plans.ts, get-public-plans.ts   Plan formatting and the public plans read
+    supabase/              client.ts (browser), server.ts (SSR), admin.ts (service role)
+proxy.ts                   Session refresh + route protection (renamed from
+                            middleware.ts — Next.js 16 convention)
+supabase/migrations/       SQL to run in the Supabase SQL Editor
 samples/                  Six synthetic invoices for testing and demos
 ```
 
@@ -223,8 +234,12 @@ Worth knowing before promising anything to a customer.
 - **Rate limits.** On a free-tier key, large batches can hit Gemini's
   requests-per-minute cap. Affected invoices show a rate-limit message and can
   be retried.
-- **Interface language.** The UI is English only. Invoice language is not a
-  constraint — see below — but the buttons and labels are not translated.
+- **Interface language.** The core app (landing, workspace, dashboard,
+  history) is localized into English, Spanish, Arabic, French, and German —
+  see `src/lib/i18n/`. The accounts/billing/admin surfaces added later
+  (sign-in, sign-up, pricing cards, /admin) are English only; translating
+  them means adding matching entries to each dictionary in
+  `src/lib/i18n/dictionaries/`.
 
 ### Invoice languages
 
@@ -247,6 +262,134 @@ only be resolved by convention.
 - **AI:** billed per request by Google. Gemini Flash models are inexpensive per
   invoice, and Google's free tier covers development and demo use. Check
   current pricing at https://ai.google.dev/pricing — rates change.
-- **Database:** none.
+- **Database:** free on Supabase's free tier for this workload.
+- **Payments:** Stripe takes a percentage per transaction — no fixed cost.
 
-The only variable cost is Gemini usage, and it scales with invoices processed.
+Gemini usage is the cost that scales directly with invoices processed. If
+accounts aren't configured (no Supabase env vars), the app runs exactly as
+described above with no database and no billing — see section 11.
+
+---
+
+## 11. Accounts, billing, and the admin panel
+
+Everything in this section is optional and additive. Leave the Supabase env
+vars unset and the app runs exactly as described in sections 1–10: no
+sign-in, no limits, one shared Gemini key. Set them and the app switches on
+accounts, plan limits, Stripe checkout, and `/admin` — no code changes
+either way, `isSupabaseConfigured()` / `isStripeConfigured()` gate all of it.
+
+### 11.1 Set up Supabase (accounts + database)
+
+1. Create a project at https://supabase.com (free tier is enough to run this).
+2. **SQL Editor** → paste the entire contents of
+   `supabase/migrations/0001_init.sql` → **Run**. This creates every table,
+   the row-level security policies, and seeds the four default plans.
+3. **Project Settings → API** → copy `Project URL`, `anon public` key, and
+   `service_role` key (secret — server only) into your env as
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `SUPABASE_SERVICE_ROLE_KEY`.
+4. **Authentication → URL Configuration** → set **Site URL** to your deployed
+   domain (or `http://localhost:3000` while developing), and add
+   `{site-url}/auth/callback` under **Redirect URLs**. Without this, email
+   confirmation and password-reset links won't come back to the app.
+5. Email confirmation and password-reset emails are sent by Supabase
+   automatically — nothing to configure for those to work, though for
+   production volume you'll eventually want **Authentication → Emails** →
+   your own SMTP provider instead of Supabase's shared one.
+
+### 11.2 Turn on "Sign in with Google"
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), create (or
+   reuse) a project → **APIs & Services → OAuth consent screen** → fill in
+   app name, support email, and the Privacy Policy / Terms URLs
+   (`/privacy` and `/terms` on your domain — see 11.5).
+2. **Credentials → Create Credentials → OAuth client ID** → type **Web
+   application**.
+3. Authorized redirect URI: your Supabase project's callback, shown on the
+   Google provider screen in Supabase (**Authentication → Providers →
+   Google**) — looks like `https://<project-ref>.supabase.co/auth/v1/callback`.
+4. Copy the generated **Client ID** and **Client Secret** into that same
+   Supabase screen, and toggle the provider on.
+
+Until this is done, the "Continue with Google" button on sign-in/sign-up
+will show a Supabase error — the email/password flow is unaffected.
+
+### 11.3 Give yourself (or anyone) free admin access
+
+Set `ADMIN_EMAILS` to a comma-separated list:
+
+```
+ADMIN_EMAILS=you@example.com,cofounder@example.com
+```
+
+Sign up (or sign in) with one of those addresses and that account gets
+unlimited extraction and a link to `/admin` in the menu — no subscription,
+no Stripe involved. This is enforced server-side on every request in
+`src/lib/auth.ts::isAdminEmail`, so it can't be spoofed from the browser.
+
+### 11.4 Connect Stripe (real billing)
+
+1. Create a [Stripe](https://stripe.com) account. You can do everything
+   below in **Test mode** first — the toggle is in the dashboard sidebar —
+   and switch to live keys later with no code changes.
+2. **Developers → API keys** → copy the **Secret key** into
+   `STRIPE_SECRET_KEY`.
+3. **Developers → Webhooks → Add endpoint**:
+   URL: `https://yourdomain.com/api/stripe/webhook`
+   Events to send: `checkout.session.completed`,
+   `customer.subscription.updated`, `customer.subscription.deleted`,
+   `invoice.payment_failed`.
+4. Copy the endpoint's **Signing secret** into `STRIPE_WEBHOOK_SECRET`.
+5. Test it: use a plan's checkout button, pay with Stripe's test card
+   `4242 4242 4242 4242` (any future date, any CVC). The subscription should
+   appear in **Stripe → Customers** and in `/admin` within seconds.
+
+**Prices are never stored in Stripe.** Checkout builds the price at the
+moment of purchase from `price_cents` in the `plans` table
+(`price_data`, not a pre-created Stripe Price object) — so editing a price
+in `/admin` changes what the *next* checkout charges immediately, with
+nothing to update on Stripe's side. Stripe only ever sees the number you
+already approved in `/admin`.
+
+### 11.5 Fill in the legal pages
+
+`/terms` and `/privacy` (`src/app/terms/page.tsx`,
+`src/app/privacy/page.tsx`) are templates with `[COMPANY NAME]`,
+`[JURISDICTION]`, `[CONTACT EMAIL]`, and `[DATE]` placeholders. Both the
+Google OAuth consent screen and Stripe ask for these URLs, so fill them in
+— and have an actual lawyer check them — before sending either application
+for review or taking real payments.
+
+### 11.6 How enforcement actually works
+
+- Every extraction request checks `/lib/auth.ts::getUsageInfo` server-side
+  in `api/extract/route.ts` — a user who has used their plan's monthly
+  quota gets a 402 with `code: "USAGE_LIMIT"`, before the file ever reaches
+  Gemini. This can't be bypassed from the client; the check is the only
+  place usage is enforced.
+- Usage isn't a counter that can drift — it's a `count()` over
+  `usage_events` rows within the current billing period, so it's always
+  exactly right and every extraction is individually visible in `/admin`.
+- Admins (`ADMIN_EMAILS`) skip the check entirely (`limit: null`).
+- Row Level Security means a signed-in user can only ever read their *own*
+  profile, subscription, and usage rows — `subscriptions` and `plans`
+  writes are blocked for everyone except the service-role key, which only
+  server code (webhook, admin actions) holds.
+
+### 11.7 What's still worth adding
+
+Real, but deliberately out of scope for this pass — pick these up as the
+product grows:
+
+- **Free-trial abuse.** Nothing currently stops the same person from
+  signing up repeatedly for a fresh free quota. Fine at small scale; add
+  device fingerprinting or phone verification if it becomes a problem.
+- **Account deletion self-service.** `/admin` can view every account, but a
+  user can't yet delete their own from the UI — for now, handle deletion
+  requests (see the Privacy Policy) manually via the Supabase dashboard.
+- **Localizing the new surfaces.** Sign-in/up, pricing, and `/admin` are
+  English only, unlike the rest of the app — see 8's note above.
+- **Custom email sender.** Confirmation and reset emails come from
+  Supabase's shared address by default; production volume needs your own
+  SMTP configured in Supabase.

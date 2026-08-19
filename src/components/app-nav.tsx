@@ -4,16 +4,27 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X, FileUp, LayoutDashboard, History, ArrowUpRight } from "lucide-react";
+import {
+  Menu,
+  X,
+  FileUp,
+  LayoutDashboard,
+  History,
+  ArrowUpRight,
+  ShieldCheck,
+  LogOut,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/wordmark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useI18n } from "@/lib/i18n/context";
+import { useAccount } from "@/lib/use-account";
 
 export function AppNav() {
   const pathname = usePathname();
   const { t } = useI18n();
+  const { account } = useAccount();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -151,6 +162,19 @@ export function AppNav() {
                     );
                   })}
 
+                  {account?.isAdmin && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 rounded-lg px-2.5 py-2.5 transition-colors hover:bg-surface-2"
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
+                        <ShieldCheck className="h-4 w-4 text-accent" />
+                      </span>
+                      <span className="text-[13px] font-medium text-ink">Admin</span>
+                    </Link>
+                  )}
+
                   <div className="my-1.5 h-px bg-line" />
                   <Link
                     href="/"
@@ -162,6 +186,26 @@ export function AppNav() {
                     </span>
                     {t.nav.backToHome}
                   </Link>
+
+                  {account?.signedIn && (
+                    <>
+                      <div className="my-1.5 h-px bg-line" />
+                      <div className="px-2.5 py-1">
+                        <p className="truncate text-[11px] text-ink-3">{account.email}</p>
+                      </div>
+                      <form action="/auth/signout" method="post">
+                        <button
+                          type="submit"
+                          className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-[13px] text-ink-2 transition-colors hover:bg-surface-2 hover:text-bad"
+                        >
+                          <span className="flex h-8 w-8 items-center justify-center">
+                            <LogOut className="h-4 w-4" />
+                          </span>
+                          Sign out
+                        </button>
+                      </form>
+                    </>
+                  )}
                 </motion.nav>
               )}
             </AnimatePresence>

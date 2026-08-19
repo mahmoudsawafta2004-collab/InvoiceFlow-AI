@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import {
   FileText,
   CheckCircle2,
@@ -11,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BillingCard } from "@/components/billing-card";
 import { useHistory } from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
@@ -24,6 +27,32 @@ export default function DashboardPage() {
   const { t } = useI18n();
   const d = t.dashboard;
   const batches = useHistory();
+
+  // A plan chosen on the pricing page before signing up arrives here as
+  // ?plan=; fire the checkout it implied exactly once instead of leaving the
+  // visitor to find the button again.
+  const triggeredRef = useRef(false);
+  useEffect(() => {
+    if (triggeredRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get("plan");
+    if (!plan) return;
+    triggeredRef.current = true;
+
+    window.history.replaceState(null, "", "/dashboard");
+
+    fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ planKey: plan }),
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.url) window.location.href = json.url;
+        else if (json.error) toast.error(json.error);
+      })
+      .catch(() => {});
+  }, []);
 
   const totalInvoices = batches.reduce((sum, b) => sum + b.rowCount, 0);
   const totalSuccess = batches.reduce((sum, b) => sum + b.successCount, 0);
@@ -75,6 +104,8 @@ export default function DashboardPage() {
           </Button>
         </Link>
       </div>
+
+      <BillingCard />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (

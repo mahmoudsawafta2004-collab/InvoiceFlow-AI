@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI, SchemaType, type Schema } from "@google/generative-ai";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { getCurrentUser, getUsageInfo } from "@/lib/auth";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -70,6 +73,32 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Once accounts are configured, every extraction must be attributed to a
+  // signed-in user and checked against their plan — this is the only place
+  // usage is actually enforced, so it has to hold even if the UI is bypassed.
+  let userId: string | null = null;
+  if (isSupabaseConfigured()) {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Sign in to extract invoices.", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
+    const usage = await getUsageInfo(user);
+    if (usage.limit !== null && usage.remaining !== null && usage.remaining <= 0) {
+      return NextResponse.json(
+        {
+          error: `You've used all ${usage.limit} invoices on your current plan for this billing period. Upgrade to continue.`,
+          code: "USAGE_LIMIT",
+        },
+        { status: 402 }
+      );
+    }
+    userId = user.id;
+  }
+
   let formData: FormData;
   try {
     formData = await req.formData();
@@ -134,6 +163,16 @@ export async function POST(req: NextRequest) {
         { error: "The AI response could not be read. Please try this invoice again." },
         { status: 502 }
       );
+    }
+
+    if (userId) {
+      const admin = createAdminClient();
+      // Best-effort: a logging failure must never block a successful
+      // extraction from reaching the user.
+      await admin
+        ?.from("usage_events")
+        .insert({ user_id: userId, file_name: file.name })
+        .then(undefined, () => {});
     }
 
     return NextResponse.json({ data });

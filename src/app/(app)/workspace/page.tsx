@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   AlertTriangle,
@@ -33,6 +34,7 @@ function makeId() {
 }
 
 export default function WorkspacePage() {
+  const router = useRouter();
   const { t } = useI18n();
   const w = t.workspace;
   const [stage, setStage] = useState<Stage>("upload");
@@ -112,6 +114,15 @@ export default function WorkspacePage() {
         prev.map((r) => (r.id === rowId ? { ...r, status: "done", data, error: undefined } : r))
       );
     } catch (err) {
+      if (err instanceof ExtractionError && err.code === "AUTH_REQUIRED") {
+        router.push(`/login?next=${encodeURIComponent(window.location.pathname)}`);
+        return;
+      }
+      if (err instanceof ExtractionError && err.code === "USAGE_LIMIT") {
+        toast.error(err.message, {
+          action: { label: "Upgrade", onClick: () => router.push("/#pricing") },
+        });
+      }
       const message = err instanceof ExtractionError ? err.message : w.errors.extractionFailed;
       setRows((prev) =>
         prev.map((r) => (r.id === rowId ? { ...r, status: "error", error: message } : r))

@@ -22,6 +22,12 @@ export function LandingFooter() {
           <Link href="/history" className="transition-colors hover:text-ink">
             {t.nav.history}
           </Link>
+          <Link href="/terms" className="transition-colors hover:text-ink">
+            Terms
+          </Link>
+          <Link href="/privacy" className="transition-colors hover:text-ink">
+            Privacy
+          </Link>
         </div>
       </div>
     </footer>
