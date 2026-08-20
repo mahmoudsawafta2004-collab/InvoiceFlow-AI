@@ -218,7 +218,7 @@ const es: Dictionary = {
         },
         {
           heading: "9. Contacto",
-          body: "Preguntas sobre estos Términos: legal@invoiceflow.app · +1 (555) 010-0199.",
+          body: "Preguntas sobre estos Términos: legal@invoiceflow.company · +1 (555) 010-0199.",
         },
       ],
     },
@@ -262,7 +262,7 @@ const es: Dictionary = {
         },
         {
           heading: "7. Contacto",
-          body: "Preguntas sobre esta política: legal@invoiceflow.app · +1 (555) 010-0199.",
+          body: "Preguntas sobre esta política: legal@invoiceflow.company · +1 (555) 010-0199.",
         },
       ],
     },

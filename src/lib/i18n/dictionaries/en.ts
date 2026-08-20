@@ -221,7 +221,7 @@ const en = {
         },
         {
           heading: "9. Contact",
-          body: "Questions about these Terms: legal@invoiceflow.app · +1 (555) 010-0199.",
+          body: "Questions about these Terms: legal@invoiceflow.company · +1 (555) 010-0199.",
         },
       ],
     },
@@ -265,7 +265,7 @@ const en = {
         },
         {
           heading: "7. Contact",
-          body: "Questions about this policy: legal@invoiceflow.app · +1 (555) 010-0199.",
+          body: "Questions about this policy: legal@invoiceflow.company · +1 (555) 010-0199.",
         },
       ],
     },

@@ -218,7 +218,7 @@ const ar: Dictionary = {
         },
         {
           heading: "٩. تواصل معنا",
-          body: "أي سؤال عن الشروط دي: legal@invoiceflow.app · +1 (555) 010-0199.",
+          body: "أي سؤال عن الشروط دي: legal@invoiceflow.company · +1 (555) 010-0199.",
         },
       ],
     },
@@ -262,7 +262,7 @@ const ar: Dictionary = {
         },
         {
           heading: "٧. تواصل معنا",
-          body: "أي سؤال عن السياسة دي: legal@invoiceflow.app · +1 (555) 010-0199.",
+          body: "أي سؤال عن السياسة دي: legal@invoiceflow.company · +1 (555) 010-0199.",
         },
       ],
     },

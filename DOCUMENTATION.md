@@ -296,7 +296,7 @@ either way, `isSupabaseConfigured()` / `isStripeConfigured()` gate all of it.
    this list, and silently falls back to **Site URL** (which defaults to
    `http://localhost:3000` on a new project) when the actual link doesn't
    match anything here.
-   - **Site URL** → your production domain, e.g. `https://invoiceflow.app`
+   - **Site URL** → your production domain, e.g. `https://invoiceflow.company`
      (use your real Vercel domain, not a per-deployment preview URL — Project
      → Settings → Domains shows the stable one).
    - **Redirect URLs** → add `{that same domain}/auth/callback`. If you also
