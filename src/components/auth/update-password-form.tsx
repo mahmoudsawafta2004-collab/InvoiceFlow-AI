@@ -4,12 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useI18n } from "@/lib/i18n/context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function UpdatePasswordForm() {
   const router = useRouter();
+  const { t } = useI18n();
+  const c = t.auth.update;
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,8 +47,8 @@ export function UpdatePasswordForm() {
         <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-ok-soft">
           <CheckCircle2 className="h-5 w-5 text-ok" />
         </div>
-        <h1 className="text-xl font-semibold tracking-[-0.01em] text-ink">Password updated</h1>
-        <p className="text-sm text-ink-2">Taking you to the app…</p>
+        <h1 className="text-xl font-semibold tracking-[-0.01em] text-ink">{c.doneTitle}</h1>
+        <p className="text-sm text-ink-2">{c.doneBody}</p>
       </div>
     );
   }
@@ -54,13 +57,13 @@ export function UpdatePasswordForm() {
     <div className="space-y-6">
       <div className="text-center">
         <h1 className="text-xl font-semibold tracking-[-0.01em] text-ink">
-          Choose a new password
+          {c.title}
         </h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="password">New password</Label>
+          <Label htmlFor="password">{c.newPassword}</Label>
           <Input
             id="password"
             type="password"
@@ -76,7 +79,7 @@ export function UpdatePasswordForm() {
 
         <Button type="submit" variant="primary" size="lg" className="w-full" disabled={loading}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          Update password
+          {c.submit}
         </Button>
       </form>
     </div>

@@ -300,6 +300,27 @@ const fr: Dictionary = {
       alreadyRegistered:
         "Cet e-mail a déjà un compte. Connectez-vous, ou réinitialisez le mot de passe si vous l'avez oublié.",
     },
+    forgot: {
+      title: "Réinitialiser votre mot de passe",
+      subtitle: "Saisissez votre e-mail et nous vous enverrons un lien.",
+      email: "E-mail",
+      submit: "Envoyer le lien",
+      backToSignIn: "Retour à la connexion",
+      sentTitle: "Vérifiez votre e-mail",
+      sentBody: (email: string) =>
+        `Si un compte existe pour ${email}, le lien est en route.`,
+    },
+    update: {
+      title: "Choisissez un nouveau mot de passe",
+      newPassword: "Nouveau mot de passe",
+      submit: "Mettre à jour",
+      doneTitle: "Mot de passe mis à jour",
+      doneBody: "Redirection vers l'application…",
+    },
+    notConfigured: {
+      title: "Les comptes ne sont pas encore configurés",
+      body: "Ce déploiement n'a aucun projet Supabase connecté, la connexion est donc indisponible. L'outil de conversion fonctionne sans compte.",
+    },
   },
   admin: {
     title: "Administration",

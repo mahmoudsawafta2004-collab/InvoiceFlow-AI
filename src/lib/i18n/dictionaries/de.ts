@@ -300,6 +300,27 @@ const de: Dictionary = {
       alreadyRegistered:
         "Für diese E-Mail existiert bereits ein Konto. Melde dich an oder setze das Passwort zurück, falls du es vergessen hast.",
     },
+    forgot: {
+      title: "Passwort zurücksetzen",
+      subtitle: "Gib deine E-Mail ein und wir schicken dir einen Link.",
+      email: "E-Mail",
+      submit: "Link senden",
+      backToSignIn: "Zurück zur Anmeldung",
+      sentTitle: "Prüfe deine E-Mails",
+      sentBody: (email: string) =>
+        `Falls ein Konto für ${email} existiert, ist der Link unterwegs.`,
+    },
+    update: {
+      title: "Neues Passwort wählen",
+      newPassword: "Neues Passwort",
+      submit: "Passwort aktualisieren",
+      doneTitle: "Passwort aktualisiert",
+      doneBody: "Weiter zur App…",
+    },
+    notConfigured: {
+      title: "Konten sind noch nicht eingerichtet",
+      body: "Für dieses Deployment ist kein Supabase-Projekt verbunden, daher ist die Anmeldung nicht verfügbar. Das Konvertierungswerkzeug funktioniert ohne Konto.",
+    },
   },
   admin: {
     title: "Administration",

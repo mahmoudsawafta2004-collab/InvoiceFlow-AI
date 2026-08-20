@@ -303,6 +303,27 @@ const en = {
       alreadyRegistered:
         "That email already has an account. Sign in instead, or reset the password if you have forgotten it.",
     },
+    forgot: {
+      title: "Reset your password",
+      subtitle: "Enter your email and we'll send a reset link.",
+      email: "Email",
+      submit: "Send reset link",
+      backToSignIn: "Back to sign in",
+      sentTitle: "Check your email",
+      sentBody: (email: string) =>
+        `If an account exists for ${email}, a reset link is on its way.`,
+    },
+    update: {
+      title: "Choose a new password",
+      newPassword: "New password",
+      submit: "Update password",
+      doneTitle: "Password updated",
+      doneBody: "Taking you to the app…",
+    },
+    notConfigured: {
+      title: "Accounts aren't set up yet",
+      body: "This deployment has no Supabase project connected, so sign-in is unavailable. The conversion tool still works without an account.",
+    },
   },
   admin: {
     title: "Admin",

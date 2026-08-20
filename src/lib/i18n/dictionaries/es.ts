@@ -300,6 +300,27 @@ const es: Dictionary = {
       alreadyRegistered:
         "Ese correo ya tiene una cuenta. Inicia sesión, o restablece la contraseña si la has olvidado.",
     },
+    forgot: {
+      title: "Restablece tu contraseña",
+      subtitle: "Introduce tu correo y te enviaremos un enlace.",
+      email: "Correo electrónico",
+      submit: "Enviar enlace",
+      backToSignIn: "Volver a iniciar sesión",
+      sentTitle: "Revisa tu correo",
+      sentBody: (email: string) =>
+        `Si existe una cuenta para ${email}, el enlace ya va en camino.`,
+    },
+    update: {
+      title: "Elige una nueva contraseña",
+      newPassword: "Nueva contraseña",
+      submit: "Actualizar contraseña",
+      doneTitle: "Contraseña actualizada",
+      doneBody: "Llevándote a la aplicación…",
+    },
+    notConfigured: {
+      title: "Las cuentas aún no están configuradas",
+      body: "Este despliegue no tiene un proyecto de Supabase conectado, así que no se puede iniciar sesión. La herramienta de conversión funciona sin cuenta.",
+    },
   },
   admin: {
     title: "Administración",
