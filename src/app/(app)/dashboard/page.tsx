@@ -15,6 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BillingCard } from "@/components/billing-card";
 import { useHistory } from "@/lib/storage";
+import { useAccount } from "@/lib/use-account";
 import { formatDate } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 
@@ -27,10 +28,14 @@ export default function DashboardPage() {
   const { t } = useI18n();
   const d = t.dashboard;
   const batches = useHistory();
+  const { account } = useAccount();
+  const billingEnabled = account.billingEnabled;
 
   // A plan chosen on the pricing page before signing up arrives here as
   // ?plan=; fire the checkout it implied exactly once instead of leaving the
-  // visitor to find the button again.
+  // visitor to find the button again. Skipped entirely while billing is
+  // unconnected — there is no checkout to open, and firing anyway is what
+  // greeted new accounts with an error toast they could do nothing about.
   const triggeredRef = useRef(false);
   useEffect(() => {
     if (triggeredRef.current) return;
@@ -40,6 +45,7 @@ export default function DashboardPage() {
     triggeredRef.current = true;
 
     window.history.replaceState(null, "", "/dashboard");
+    if (!billingEnabled) return;
 
     fetch("/api/stripe/checkout", {
       method: "POST",
@@ -52,7 +58,7 @@ export default function DashboardPage() {
         else if (json.error) toast.error(json.error);
       })
       .catch(() => {});
-  }, []);
+  }, [billingEnabled]);
 
   const totalInvoices = batches.reduce((sum, b) => sum + b.rowCount, 0);
   const totalSuccess = batches.reduce((sum, b) => sum + b.successCount, 0);
@@ -108,8 +114,8 @@ export default function DashboardPage() {
       <BillingCard />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.label}>
+        {stats.map((stat, i) => (
+          <Card key={i}>
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-ink-2">{stat.label}</p>

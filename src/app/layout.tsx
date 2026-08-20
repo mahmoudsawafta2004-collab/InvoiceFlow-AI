@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Instrument_Sans, Instrument_Serif, JetBrains_Mono, Noto_Sans_Arabic } from "next/font/google";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeScript } from "@/components/theme-script";
-import { LocaleScript } from "@/components/locale-script";
 import { I18nProvider } from "@/lib/i18n/context";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALE_META, isLocale } from "@/lib/i18n/locales";
 import "./globals.css";
 
 const sans = Instrument_Sans({
@@ -42,19 +43,24 @@ export const metadata: Metadata = {
     "Upload up to 50 invoice PDFs and get a clean, structured Excel file in minutes. AI-powered extraction built for accountants and finance teams.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Resolved here, on the server, so the markup ships in the right language and
+  // direction — no post-hydration flip from English to the stored preference.
+  const stored = (await cookies()).get(LOCALE_COOKIE)?.value;
+  const locale = stored && isLocale(stored) ? stored : DEFAULT_LOCALE;
+
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir={LOCALE_META[locale].dir}
       suppressHydrationWarning
       className={`${sans.variable} ${display.variable} ${mono.variable} ${sansArabic.variable} h-full antialiased`}
     >
       <head>
         <ThemeScript />
-        <LocaleScript />
       </head>
       <body className="min-h-full flex flex-col bg-canvas text-ink">
-        <I18nProvider>
+        <I18nProvider initialLocale={locale}>
           <TooltipProvider delayDuration={150}>{children}</TooltipProvider>
           <Toaster position="top-right" richColors closeButton />
         </I18nProvider>

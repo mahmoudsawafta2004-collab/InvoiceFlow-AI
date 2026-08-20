@@ -1,7 +1,13 @@
 "use client";
 
-import { createContext, useContext, useMemo, useSyncExternalStore } from "react";
-import { DEFAULT_LOCALE, isLocale, LOCALE_META, type Locale } from "./locales";
+import { createContext, useContext, useMemo, useState } from "react";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_COOKIE,
+  LOCALE_COOKIE_MAX_AGE,
+  LOCALE_META,
+  type Locale,
+} from "./locales";
 import type { Dictionary } from "./dictionary-type";
 import en from "./dictionaries/en";
 import es from "./dictionaries/es";
@@ -10,42 +16,6 @@ import fr from "./dictionaries/fr";
 import de from "./dictionaries/de";
 
 const DICTIONARIES: Record<Locale, Dictionary> = { en, es, ar, fr, de };
-const STORAGE_KEY = "invoiceflow.locale";
-
-type Listener = () => void;
-const listeners = new Set<Listener>();
-
-function subscribe(listener: Listener) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-/**
- * The inline LocaleScript sets <html lang> before hydration based on a
- * stored preference (English otherwise), which the server cannot know
- * ahead of time. Reading it
- * with useSyncExternalStore — server snapshot pinned to English, client
- * snapshot the real DOM value — is what lets the very first client render
- * show the visitor's language without a hydration mismatch on every
- * translated string on the page.
- */
-function getSnapshot(): Locale {
-  const attr = document.documentElement.lang;
-  return isLocale(attr) ? attr : DEFAULT_LOCALE;
-}
-
-function getServerSnapshot(): Locale {
-  return DEFAULT_LOCALE;
-}
-
-export function setLocale(locale: Locale) {
-  document.documentElement.lang = locale;
-  document.documentElement.dir = LOCALE_META[locale].dir;
-  try {
-    localStorage.setItem(STORAGE_KEY, locale);
-  } catch {}
-  for (const listener of listeners) listener();
-}
 
 interface I18nValue {
   locale: Locale;
@@ -56,18 +26,37 @@ interface I18nValue {
 
 const I18nContext = createContext<I18nValue | null>(null);
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const locale = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+/**
+ * The locale arrives already resolved from the server (read from the cookie in
+ * the root layout), so the first render — server and client alike — is in the
+ * visitor's language. Switching writes the cookie and updates state in place;
+ * no reload, and the next request is already correct.
+ */
+export function I18nProvider({
+  initialLocale,
+  children,
+}: {
+  initialLocale: Locale;
+  children: React.ReactNode;
+}) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
-  const value = useMemo<I18nValue>(
-    () => ({
+  const value = useMemo<I18nValue>(() => {
+    function setLocale(next: Locale) {
+      const dir = LOCALE_META[next].dir;
+      document.documentElement.lang = next;
+      document.documentElement.dir = dir;
+      document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`;
+      setLocaleState(next);
+    }
+
+    return {
       locale,
       setLocale,
-      t: DICTIONARIES[locale],
+      t: DICTIONARIES[locale] ?? DICTIONARIES[DEFAULT_LOCALE],
       dir: LOCALE_META[locale].dir,
-    }),
-    [locale]
-  );
+    };
+  }, [locale]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }

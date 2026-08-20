@@ -14,3 +14,13 @@ export const LOCALE_META: Record<Locale, { label: string; nativeLabel: string; d
 export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value);
 }
+
+/**
+ * Locale lives in a cookie rather than localStorage so the server renders
+ * <html lang/dir> and every translated string in the right language on the
+ * very first byte. localStorage is invisible to the server, which meant a
+ * signed-in visitor's language could only be applied after hydration — the
+ * page would paint in English and visibly flip afterwards.
+ */
+export const LOCALE_COOKIE = "invoiceflow.locale";
+export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;

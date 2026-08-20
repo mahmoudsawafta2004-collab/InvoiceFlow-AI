@@ -6,6 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import type { AdminUserRow } from "@/lib/admin";
 import type { Plan } from "@/lib/supabase/types";
 import { setUserPlanAction } from "@/app/(app)/admin/actions";
+import { useI18n } from "@/lib/i18n/context";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 
@@ -18,15 +19,27 @@ const statusVariant: Record<string, "success" | "warning" | "destructive" | "sec
 };
 
 export function UsersTable({ users, plans }: { users: AdminUserRow[]; plans: Plan[] }) {
+  const { t } = useI18n();
+  const u = t.admin.users;
+  const headers = [u.colUser, u.colPlan, u.colStatus, u.colUsage, u.colJoined, ""];
+
+  if (users.length === 0) {
+    return (
+      <div className="rounded-xl border border-line bg-surface px-4 py-10 text-center text-[13px] text-ink-2">
+        {u.empty}
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-auto rounded-xl border border-line bg-surface">
       <table className="w-full min-w-[840px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-line bg-surface-2">
-            {["User", "Plan", "Status", "Usage this period", "Joined", ""].map((h) => (
+            {headers.map((h, i) => (
               <th
-                key={h}
-                className="px-4 py-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3"
+                key={i}
+                className="px-4 py-2.5 text-start text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3"
               >
                 {h}
               </th>
@@ -34,8 +47,8 @@ export function UsersTable({ users, plans }: { users: AdminUserRow[]; plans: Pla
           </tr>
         </thead>
         <tbody className="divide-y divide-line">
-          {users.map((u) => (
-            <UserRow key={u.id} user={u} plans={plans} />
+          {users.map((row) => (
+            <UserRow key={row.id} user={row} plans={plans} />
           ))}
         </tbody>
       </table>
@@ -44,6 +57,8 @@ export function UsersTable({ users, plans }: { users: AdminUserRow[]; plans: Pla
 }
 
 function UserRow({ user, plans }: { user: AdminUserRow; plans: Plan[] }) {
+  const { t } = useI18n();
+  const u = t.admin.users;
   const [isPending, startTransition] = useTransition();
   const [planKey, setPlanKey] = useState(user.planKey);
 
@@ -54,9 +69,9 @@ function UserRow({ user, plans }: { user: AdminUserRow; plans: Plan[] }) {
     startTransition(async () => {
       try {
         await setUserPlanAction(user.id, plan.id);
-        toast.success(`${user.email} moved to ${plan.name}`);
+        toast.success(u.moved(user.email, plan.name));
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Couldn't update plan.");
+        toast.error(err instanceof Error ? err.message : u.updateFailed);
       }
     });
   }

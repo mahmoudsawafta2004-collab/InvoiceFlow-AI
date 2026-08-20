@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useAccount } from "@/lib/use-account";
+import { useI18n } from "@/lib/i18n/context";
 import { Button } from "@/components/ui/button";
 
 export function PricingButton({
@@ -20,19 +21,27 @@ export function PricingButton({
 }) {
   const router = useRouter();
   const { account } = useAccount();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
-    // Signed out (or Supabase not configured, or still loading): the signup
-    // flow carries ?plan= through so an upgrade can be offered right after
-    // confirmation, rather than dropping the visitor's choice on the floor.
-    if (!account?.signedIn) {
+    // Signed out (or Supabase not configured): the signup flow carries ?plan=
+    // through so an upgrade can be offered right after confirmation, rather
+    // than dropping the visitor's choice on the floor.
+    if (!account.signedIn) {
       router.push(`/signup?plan=${planKey}`);
       return;
     }
 
     if (isFree) {
       router.push("/workspace");
+      return;
+    }
+
+    // Paid plan on a deployment with no Stripe key: say so instead of firing a
+    // request that can only come back 503.
+    if (!account.billingEnabled) {
+      toast.info(t.billing.comingSoon);
       return;
     }
 
@@ -47,11 +56,11 @@ export function PricingButton({
       if (json.url) {
         window.location.href = json.url;
       } else {
-        toast.error(json.error || "Couldn't start checkout.");
+        toast.error(json.error || t.billing.checkoutFailed);
         setLoading(false);
       }
     } catch {
-      toast.error("Couldn't start checkout.");
+      toast.error(t.billing.checkoutFailed);
       setLoading(false);
     }
   }

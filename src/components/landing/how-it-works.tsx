@@ -45,7 +45,7 @@ export function HowItWorks() {
           {h.steps.map((step, i) => {
             const Icon = icons[i];
             return (
-              <RevealItem key={step.title} className="relative">
+              <RevealItem key={i} className="relative">
                 <div
                   className={cn(
                     "flex h-10 w-10 items-center justify-center rounded-xl shadow-raise ring-1 ring-inset ring-line",

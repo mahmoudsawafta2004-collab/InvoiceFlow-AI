@@ -48,7 +48,7 @@ export function Features() {
 
         <RevealGroup className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {h.cards.map((card, i) => (
-            <RevealItem key={card.title} className={cn(spans[i])}>
+            <RevealItem key={i} className={cn(spans[i])}>
               <FeatureCard
                 icon={icons[i]}
                 title={card.title}

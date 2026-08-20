@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 
 export interface AccountSummary {
   configured: boolean;
   signedIn: boolean;
+  /** True only when a Stripe secret key is present on the deployment. */
+  billingEnabled: boolean;
   email?: string;
   isAdmin?: boolean;
   plan?: { key: string; name: string } | null;
@@ -16,28 +18,21 @@ export interface AccountSummary {
   };
 }
 
-/** One-shot fetch of the signed-in visitor's account state — plan, usage, admin flag. */
-export function useAccount() {
-  const [data, setData] = useState<AccountSummary | null>(null);
-  const [loading, setLoading] = useState(true);
+export const EMPTY_ACCOUNT: AccountSummary = {
+  configured: false,
+  signedIn: false,
+  billingEnabled: false,
+};
 
-  useEffect(() => {
-    let active = true;
-    fetch("/api/account/summary")
-      .then((res) => res.json())
-      .then((json) => {
-        if (active) setData(json);
-      })
-      .catch(() => {
-        if (active) setData({ configured: false, signedIn: false });
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+/**
+ * Account state is resolved on the server and handed down through this
+ * context. It used to be fetched from /api/account/summary after hydration,
+ * which meant a cold serverless round trip — several seconds during which the
+ * nav showed no email and the dashboard no plan, on a page that was otherwise
+ * fully rendered. Nothing here waits on the network any more.
+ */
+export const AccountContext = createContext<AccountSummary>(EMPTY_ACCOUNT);
 
-  return { account: data, loading };
+export function useAccount(): { account: AccountSummary; loading: boolean } {
+  return { account: useContext(AccountContext), loading: false };
 }

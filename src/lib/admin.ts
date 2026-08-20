@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isAdminEmail } from "@/lib/auth";
 import type { Plan } from "@/lib/supabase/types";
 
 export interface AdminUserRow {
@@ -52,7 +53,15 @@ export async function getAdminOverview(): Promise<AdminOverview | null> {
   let activePaidSubscriptions = 0;
   let mrrCents = 0;
 
-  for (const profile of profiles ?? []) {
+  // Owner accounts are staff, not customers: they hold a profile row like
+  // everyone else (the signup trigger makes one), but listing them among the
+  // subscribers — and counting them in "total users" — overstates the customer
+  // base and makes the operator's own test account look like a signup.
+  const customers = (profiles ?? []).filter(
+    (p) => !isAdminEmail(p.email) && p.role !== "admin"
+  );
+
+  for (const profile of customers) {
     const sub = subByUser.get(profile.id);
     const plan = sub ? planById.get(sub.plan_id) : undefined;
 
@@ -87,7 +96,7 @@ export async function getAdminOverview(): Promise<AdminOverview | null> {
   }
 
   return {
-    totalUsers: profiles?.length ?? 0,
+    totalUsers: customers.length,
     activePaidSubscriptions,
     mrrCents,
     invoicesThisMonth: invoicesThisMonth ?? 0,

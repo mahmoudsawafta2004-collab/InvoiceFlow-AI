@@ -32,10 +32,17 @@ export async function proxy(request: NextRequest) {
   });
 
   // Required even though the result isn't used directly: this call is what
-  // refreshes an expiring session and rewrites the cookies above.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // refreshes an expiring session and rewrites the cookies above. A failure
+  // here must not take down every route in the app — an unreachable Auth
+  // server should log people out, not serve them an error on every page.
+  let user = null;
+  try {
+    ({
+      data: { user },
+    } = await supabase.auth.getUser());
+  } catch {
+    user = null;
+  }
 
   const path = request.nextUrl.pathname;
   const isProtected = PROTECTED_PREFIXES.some(

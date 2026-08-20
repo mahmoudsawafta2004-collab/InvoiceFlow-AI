@@ -302,14 +302,44 @@ either way, `isSupabaseConfigured()` / `isStripeConfigured()` gate all of it.
    - **Redirect URLs** → add `{that same domain}/auth/callback`. If you also
      test locally, add `http://localhost:3000/auth/callback` as a second
      entry — both can coexist.
-5. **Authentication → Email Templates** — Supabase's default emails are
-   unbranded ("Confirm your email address", sent from
-   `noreply@mail.app.supabase.io"). Two ready-to-paste branded templates
-   ship in `supabase/email-templates/`: open **Confirm signup**, replace the
-   body with `confirm-signup.html`, then do the same for **Reset Password**
-   with `reset-password.html`. For production volume beyond Supabase's
-   shared sending limits, you'll eventually also want your own SMTP
-   provider under this same section.
+5. **Authentication → Emails** — see 11.1a. Branding the confirmation and
+   reset emails requires connecting your own SMTP sender first; Supabase
+   locks the template bodies until you do.
+
+### 11.1a Branded confirmation and password-reset emails
+
+Two ready-to-paste templates ship in `supabase/email-templates/`
+(`confirm-signup.html` and `reset-password.html`) — company wordmark, brand
+colours, a real button, and `{{ .ConfirmationURL }}` where Supabase injects
+the link.
+
+**They cannot be applied until a custom SMTP sender is connected.** On the
+shared sending service, Supabase disables template editing outright and sends
+its own unbranded mail from `noreply@mail.app.supabase.io`. The dashboard
+says as much: *"Set up custom SMTP to edit templates."* That is a platform
+limit, not a setting to hunt for.
+
+Connecting a sender, using [Resend](https://resend.com) (free for 3,000
+emails a month, which is far past what a demo needs):
+
+1. Sign up at resend.com → **Domains → Add Domain** → your domain.
+2. Resend prints four DNS records (a DKIM `TXT`, an SPF `TXT`, an `MX`, and
+   an optional DMARC `TXT`). Add them at your registrar. Hostinger users get
+   a one-click **"Go to Hostinger"** button that writes all four.
+3. Wait for the domain to read **Verified**, then **API Keys → Create API
+   Key** and copy it.
+4. In Supabase: **Project Settings → Authentication → SMTP Settings** →
+   enable custom SMTP and fill in:
+   - Host `smtp.resend.com`, Port `465`, Username `resend`
+   - Password: the Resend API key
+   - Sender email `noreply@yourdomain`, Sender name `InvoiceFlow`
+5. Back in **Authentication → Emails**, the **Body** field is now editable.
+   Open **Confirm signup**, replace the body with the contents of
+   `confirm-signup.html`, save; repeat for **Reset Password** with
+   `reset-password.html`.
+
+Leave `{{ .ConfirmationURL }}` exactly as it appears in the templates —
+Supabase substitutes the real link into it at send time.
 
 ### 11.2 Turn on "Sign in with Google"
 
@@ -333,6 +363,29 @@ page), so the button only renders once you've confirmed setup is done:
 5. Set `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` in your environment and
    redeploy. Only then does the Google button appear on `/login` and
    `/signup` — leave it unset (or `false`) until steps 1–4 are actually done.
+
+#### Why the consent screen says `<project-ref>.supabase.co`
+
+Google's account chooser shows "to continue to **<project-ref>.supabase.co**"
+rather than your own domain. That string is the OAuth client's redirect host,
+and the redirect host is Supabase's, because Supabase is the party actually
+completing the exchange. Nothing in this codebase controls it.
+
+Two things change it, and only two:
+
+- **Set the app name under Google Auth Platform → Branding.** Once the app
+  name and logo are filled in *and Google has verified the app*, the chooser
+  shows the app name instead of the bare host. Verification is a review
+  Google runs on the consent screen; until it completes, unverified apps keep
+  showing the raw host. This is the free path and the one to do first.
+- **Give Supabase Auth a custom domain** (e.g. `auth.invoiceflow.company`), a
+  paid Supabase add-on. The callback then lives on your own domain, so the
+  chooser shows your domain with no verification needed. Point the Google
+  client's redirect URI at the custom domain afterwards.
+
+Whoever buys this deployment will redo the OAuth client under their own
+Google project anyway, so leaving it on the default host is a reasonable
+place to stop for now.
 
 ### 11.3 Give yourself (or anyone) free admin access
 

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Loader2, Mail, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isGoogleAuthEnabled } from "@/lib/supabase/env";
+import { useI18n } from "@/lib/i18n/context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,8 @@ export function SignupForm() {
   const params = useSearchParams();
   const plan = params.get("plan");
   const postAuthPath = plan && plan !== "free" ? `/dashboard?plan=${plan}` : "/workspace";
+  const { t } = useI18n();
+  const c = t.auth.signup;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,7 +35,7 @@ export function SignupForm() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -43,6 +46,17 @@ export function SignupForm() {
 
     if (error) {
       setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    // Supabase deliberately answers a signup for an existing address with a
+    // success shaped exactly like a new one, so an attacker cannot probe which
+    // emails are registered. The one tell is an empty identities array — the
+    // obfuscated user it hands back owns no identity. Without this check the
+    // form claims to have sent a confirmation link that never arrives.
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      setError(c.alreadyRegistered);
       setLoading(false);
       return;
     }
@@ -69,11 +83,8 @@ export function SignupForm() {
         <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-ok-soft">
           <Mail className="h-5 w-5 text-ok" />
         </div>
-        <h1 className="text-xl font-semibold tracking-[-0.01em] text-ink">Check your email</h1>
-        <p className="text-sm text-ink-2">
-          We sent a confirmation link to <span className="font-medium text-ink">{email}</span>.
-          Click it to activate your account.
-        </p>
+        <h1 className="text-xl font-semibold tracking-[-0.01em] text-ink">{c.sentTitle}</h1>
+        <p className="text-sm text-ink-2">{c.sentBody(email)}</p>
       </div>
     );
   }
@@ -81,8 +92,8 @@ export function SignupForm() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-xl font-semibold tracking-[-0.01em] text-ink">Create your account</h1>
-        <p className="mt-1 text-sm text-ink-2">Starts on the free plan — no card required.</p>
+        <h1 className="text-xl font-semibold tracking-[-0.01em] text-ink">{c.title}</h1>
+        <p className="mt-1 text-sm text-ink-2">{c.subtitle}</p>
       </div>
 
       {isGoogleAuthEnabled() && (
@@ -99,12 +110,12 @@ export function SignupForm() {
             ) : (
               <GoogleIcon className="h-4 w-4" />
             )}
-            Continue with Google
+            {c.google}
           </Button>
 
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-line" />
-            <span className="text-[11px] uppercase tracking-wider text-ink-3">or</span>
+            <span className="text-[11px] uppercase tracking-wider text-ink-3">{c.or}</span>
             <div className="h-px flex-1 bg-line" />
           </div>
         </>
@@ -112,7 +123,7 @@ export function SignupForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="name">Full name</Label>
+          <Label htmlFor="name">{c.name}</Label>
           <Input
             id="name"
             required
@@ -121,7 +132,7 @@ export function SignupForm() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{c.email}</Label>
           <Input
             id="email"
             type="email"
@@ -132,7 +143,7 @@ export function SignupForm() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{c.password}</Label>
           <Input
             id="password"
             type="password"
@@ -144,7 +155,19 @@ export function SignupForm() {
           />
         </div>
 
-        {error && <p className="text-[13px] text-bad">{error}</p>}
+        {error && (
+          <p className="text-[13px] text-bad">
+            {error}
+            {error === c.alreadyRegistered && (
+              <>
+                {" "}
+                <Link href="/login" className="font-medium text-accent hover:underline">
+                  {c.signIn}
+                </Link>
+              </>
+            )}
+          </p>
+        )}
 
         <Button type="submit" variant="primary" size="lg" className="w-full" disabled={loading}>
           {loading ? (
@@ -152,21 +175,21 @@ export function SignupForm() {
           ) : (
             <UserPlus className="h-4 w-4" />
           )}
-          Create account
+          {c.submit}
         </Button>
       </form>
 
       <p className="text-center text-[13px] text-ink-2">
-        Already have an account?{" "}
+        {c.haveAccount}{" "}
         <Link href="/login" className="font-medium text-accent hover:underline">
-          Sign in
+          {c.signIn}
         </Link>
       </p>
 
       <p className="text-center text-[12px] text-ink-3">
-        By continuing you agree to our{" "}
-        <Link href="/terms" className="hover:underline">Terms</Link> and{" "}
-        <Link href="/privacy" className="hover:underline">Privacy Policy</Link>.
+        {c.agree}{" "}
+        <Link href="/terms" className="hover:underline">{t.nav.terms}</Link> {c.and}{" "}
+        <Link href="/privacy" className="hover:underline">{t.nav.privacy}</Link>.
       </p>
     </div>
   );

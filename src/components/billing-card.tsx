@@ -5,16 +5,17 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { CreditCard, ExternalLink, Loader2, ShieldCheck } from "lucide-react";
 import { useAccount } from "@/lib/use-account";
+import { useI18n } from "@/lib/i18n/context";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 export function BillingCard() {
-  const { account, loading } = useAccount();
+  const { account } = useAccount();
+  const { t } = useI18n();
+  const b = t.billing;
   const [portalLoading, setPortalLoading] = useState(false);
-
-  if (loading || !account?.configured || !account.signedIn) return null;
 
   async function openPortal() {
     setPortalLoading(true);
@@ -24,12 +25,14 @@ export function BillingCard() {
       if (json.url) {
         window.location.href = json.url;
       } else {
-        toast.error(json.error || "Couldn't open billing portal.");
+        toast.error(json.error || b.portalFailed);
       }
     } finally {
       setPortalLoading(false);
     }
   }
+
+  if (!account.configured || !account.signedIn) return null;
 
   if (account.isAdmin) {
     return (
@@ -39,10 +42,8 @@ export function BillingCard() {
             <ShieldCheck className="h-5 w-5 text-accent" />
           </div>
           <div>
-            <p className="text-sm font-medium text-ink">Admin account</p>
-            <p className="text-[13px] text-ink-2">
-              Unlimited extractions — no subscription needed.
-            </p>
+            <p className="text-sm font-medium text-ink">{b.adminTitle}</p>
+            <p className="text-[13px] text-ink-2">{b.adminBody}</p>
           </div>
         </CardContent>
       </Card>
@@ -60,34 +61,39 @@ export function BillingCard() {
       <CardContent className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-[13px] text-ink-2">Current plan</p>
+            <p className="text-[13px] text-ink-2">{b.currentPlan}</p>
             <p className="text-lg font-semibold tracking-[-0.01em] text-ink">
               {account.plan?.name ?? "Free"}
             </p>
           </div>
-          <div className="flex gap-2">
-            <Link href="/#pricing">
-              <Button variant="primary" size="sm">
-                <CreditCard className="h-3.5 w-3.5" />
-                Upgrade
+          {/* Both buttons lead somewhere that only exists once Stripe keys are
+              set. Until then the deployment says so plainly rather than
+              offering a control that can only fail. */}
+          {account.billingEnabled ? (
+            <div className="flex gap-2">
+              <Link href="/#pricing">
+                <Button variant="primary" size="sm">
+                  <CreditCard className="h-3.5 w-3.5" />
+                  {b.upgrade}
+                </Button>
+              </Link>
+              <Button variant="outline" size="sm" onClick={openPortal} disabled={portalLoading}>
+                {portalLoading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <ExternalLink className="h-3.5 w-3.5" />
+                )}
+                {b.manage}
               </Button>
-            </Link>
-            <Button variant="outline" size="sm" onClick={openPortal} disabled={portalLoading}>
-              {portalLoading ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <ExternalLink className="h-3.5 w-3.5" />
-              )}
-              Manage billing
-            </Button>
-          </div>
+            </div>
+          ) : (
+            <p className="text-[13px] text-ink-3">{b.comingSoon}</p>
+          )}
         </div>
 
         <div className="mt-4">
           <div className="flex items-center justify-between text-[13px]">
-            <span className="text-ink-2">
-              {used} / {limit || "—"} invoices this period
-            </span>
+            <span className="text-ink-2">{b.invoicesThisPeriod(used, String(limit || "—"))}</span>
             <span className={cn("tabular font-medium", nearLimit ? "text-warn" : "text-ink-3")}>
               {pct}%
             </span>

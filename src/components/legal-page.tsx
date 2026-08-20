@@ -46,13 +46,13 @@ export function LegalPage({ kind }: { kind: "terms" | "privacy" }) {
         <p className="mt-2 text-[13px] text-ink-3">{t.legal.lastUpdated(doc.updated)}</p>
 
         <div className="mt-10 space-y-8 text-[15px] leading-relaxed text-ink-2">
-          {sections.map((section) => (
-            <section key={section.heading}>
+          {sections.map((section, i) => (
+            <section key={i}>
               <h2 className="text-lg font-semibold text-ink">{section.heading}</h2>
               {section.items && (
                 <ul className="mt-2 list-disc space-y-1 ps-5">
-                  {section.items.map((item) => (
-                    <li key={item}>{item}</li>
+                  {section.items.map((item, j) => (
+                    <li key={j}>{item}</li>
                   ))}
                 </ul>
               )}
