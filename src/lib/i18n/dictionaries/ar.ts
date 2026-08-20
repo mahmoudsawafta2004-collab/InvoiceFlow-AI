@@ -83,6 +83,7 @@ const ar: Dictionary = {
       cta: "حوّل دفعتك الأولى",
     },
     footer: {
+      tagline: "‏InvoiceFlow يحوّل دفعات فواتير PDF إلى ملف Excel منظّم.",
       rights: (year) => `© ${year} InvoiceFlow`,
     },
   },

@@ -83,6 +83,7 @@ const de: Dictionary = {
       cta: "Ersten Stapel konvertieren",
     },
     footer: {
+      tagline: "InvoiceFlow wandelt Stapel von Rechnungs-PDFs in eine strukturierte Excel-Tabelle um.",
       rights: (year) => `© ${year} InvoiceFlow`,
     },
   },

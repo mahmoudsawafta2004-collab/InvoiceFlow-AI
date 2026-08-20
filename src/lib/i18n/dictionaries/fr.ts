@@ -83,6 +83,7 @@ const fr: Dictionary = {
       cta: "Convertir votre premier lot",
     },
     footer: {
+      tagline: "InvoiceFlow convertit des lots de factures PDF en un tableur Excel structuré.",
       rights: (year) => `© ${year} InvoiceFlow`,
     },
   },

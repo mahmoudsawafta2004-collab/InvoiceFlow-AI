@@ -83,6 +83,7 @@ const es: Dictionary = {
       cta: "Convierte tu primer lote",
     },
     footer: {
+      tagline: "InvoiceFlow convierte lotes de facturas en PDF en una hoja de Excel estructurada.",
       rights: (year) => `© ${year} InvoiceFlow`,
     },
   },

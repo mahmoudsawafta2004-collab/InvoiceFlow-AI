@@ -86,6 +86,7 @@ const en = {
       cta: "Convert your first batch",
     },
     footer: {
+      tagline: "InvoiceFlow converts batches of invoice PDFs into a structured Excel spreadsheet.",
       rights: (year: number) => `© ${year} InvoiceFlow`,
     },
   },
