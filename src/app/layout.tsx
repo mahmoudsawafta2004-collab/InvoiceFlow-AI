@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeScript } from "@/components/theme-script";
 import { I18nProvider } from "@/lib/i18n/context";
+import { RecoveryRedirect } from "@/components/auth/recovery-redirect";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALE_META, isLocale } from "@/lib/i18n/locales";
 import "./globals.css";
 
@@ -61,6 +62,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full flex flex-col bg-canvas text-ink">
         <I18nProvider initialLocale={locale}>
+          <RecoveryRedirect />
           <TooltipProvider delayDuration={150}>{children}</TooltipProvider>
           <Toaster position="top-right" richColors closeButton />
         </I18nProvider>

@@ -301,6 +301,7 @@ const es: Dictionary = {
         "Ese correo ya tiene una cuenta. Inicia sesión, o restablece la contraseña si la has olvidado.",
     },
     forgot: {
+      linkExpired: "Ese enlace ha caducado o ya se usó. Solicita uno nuevo abajo.",
       title: "Restablece tu contraseña",
       subtitle: "Introduce tu correo y te enviaremos un enlace.",
       email: "Correo electrónico",

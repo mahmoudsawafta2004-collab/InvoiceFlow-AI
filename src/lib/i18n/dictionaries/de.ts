@@ -301,6 +301,7 @@ const de: Dictionary = {
         "Für diese E-Mail existiert bereits ein Konto. Melde dich an oder setze das Passwort zurück, falls du es vergessen hast.",
     },
     forgot: {
+      linkExpired: "Dieser Link ist abgelaufen oder wurde bereits verwendet. Fordere unten einen neuen an.",
       title: "Passwort zurücksetzen",
       subtitle: "Gib deine E-Mail ein und wir schicken dir einen Link.",
       email: "E-Mail",

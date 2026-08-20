@@ -301,6 +301,7 @@ const fr: Dictionary = {
         "Cet e-mail a déjà un compte. Connectez-vous, ou réinitialisez le mot de passe si vous l'avez oublié.",
     },
     forgot: {
+      linkExpired: "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau ci-dessous.",
       title: "Réinitialiser votre mot de passe",
       subtitle: "Saisissez votre e-mail et nous vous enverrons un lien.",
       email: "E-mail",

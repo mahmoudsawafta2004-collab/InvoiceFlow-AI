@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, KeyRound, Loader2, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/context";
@@ -12,6 +13,9 @@ import { Label } from "@/components/ui/label";
 export function ForgotPasswordForm() {
   const { t } = useI18n();
   const c = t.auth.forgot;
+  // A bounced-back recovery link lands here with ?error=, so the visitor is
+  // told why nothing happened instead of guessing.
+  const linkError = useSearchParams().get("error");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,7 +88,9 @@ export function ForgotPasswordForm() {
           />
         </div>
 
-        {error && <p className="text-[13px] text-bad">{error}</p>}
+        {(error || linkError) && (
+          <p className="text-[13px] text-bad">{error ?? c.linkExpired}</p>
+        )}
 
         <Button type="submit" variant="primary" size="lg" className="w-full" disabled={loading}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}

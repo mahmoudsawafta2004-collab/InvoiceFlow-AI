@@ -304,6 +304,7 @@ const en = {
         "That email already has an account. Sign in instead, or reset the password if you have forgotten it.",
     },
     forgot: {
+      linkExpired: "That reset link has expired or was already used. Request a new one below.",
       title: "Reset your password",
       subtitle: "Enter your email and we'll send a reset link.",
       email: "Email",
