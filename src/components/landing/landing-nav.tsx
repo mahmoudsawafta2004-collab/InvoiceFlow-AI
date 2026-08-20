@@ -34,7 +34,7 @@ export function LandingNav() {
         <div className="flex items-center gap-1.5">
           <LanguageSwitcher />
           <ThemeToggle />
-          <Link href="/workspace">
+          <Link href="/signup">
             <Button variant="primary" size="sm">
               {t.landing.nav.tryFree}
             </Button>

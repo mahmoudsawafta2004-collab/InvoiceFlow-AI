@@ -289,16 +289,35 @@ either way, `isSupabaseConfigured()` / `isStripeConfigured()` gate all of it.
    `service_role` key (secret — server only) into your env as
    `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
    `SUPABASE_SERVICE_ROLE_KEY`.
-4. **Authentication → URL Configuration** → set **Site URL** to your deployed
-   domain (or `http://localhost:3000` while developing), and add
-   `{site-url}/auth/callback` under **Redirect URLs**. Without this, email
-   confirmation and password-reset links won't come back to the app.
-5. Email confirmation and password-reset emails are sent by Supabase
-   automatically — nothing to configure for those to work, though for
-   production volume you'll eventually want **Authentication → Emails** →
-   your own SMTP provider instead of Supabase's shared one.
+4. **Authentication → URL Configuration** — this step is mandatory, not
+   optional, and skipping it is the single most common cause of the
+   confirmation link redirecting to `localhost` with `otp_expired` in the
+   URL instead of your real site: Supabase validates every redirect against
+   this list, and silently falls back to **Site URL** (which defaults to
+   `http://localhost:3000` on a new project) when the actual link doesn't
+   match anything here.
+   - **Site URL** → your production domain, e.g. `https://invoiceflow.app`
+     (use your real Vercel domain, not a per-deployment preview URL — Project
+     → Settings → Domains shows the stable one).
+   - **Redirect URLs** → add `{that same domain}/auth/callback`. If you also
+     test locally, add `http://localhost:3000/auth/callback` as a second
+     entry — both can coexist.
+5. **Authentication → Email Templates** — Supabase's default emails are
+   unbranded ("Confirm your email address", sent from
+   `noreply@mail.app.supabase.io"). Two ready-to-paste branded templates
+   ship in `supabase/email-templates/`: open **Confirm signup**, replace the
+   body with `confirm-signup.html`, then do the same for **Reset Password**
+   with `reset-password.html`. For production volume beyond Supabase's
+   shared sending limits, you'll eventually also want your own SMTP
+   provider under this same section.
 
 ### 11.2 Turn on "Sign in with Google"
+
+The "Continue with Google" button is hidden by default — attempting Google
+sign-in against a project that hasn't had the provider enabled doesn't fail
+gracefully (supabase-js navigates straight to Supabase's authorize endpoint
+regardless, landing on a raw `{"error_code":"validation_failed"}` JSON
+page), so the button only renders once you've confirmed setup is done:
 
 1. In [Google Cloud Console](https://console.cloud.google.com/), create (or
    reuse) a project → **APIs & Services → OAuth consent screen** → fill in
@@ -311,9 +330,9 @@ either way, `isSupabaseConfigured()` / `isStripeConfigured()` gate all of it.
    Google**) — looks like `https://<project-ref>.supabase.co/auth/v1/callback`.
 4. Copy the generated **Client ID** and **Client Secret** into that same
    Supabase screen, and toggle the provider on.
-
-Until this is done, the "Continue with Google" button on sign-in/sign-up
-will show a Supabase error — the email/password flow is unaffected.
+5. Set `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` in your environment and
+   redeploy. Only then does the Google button appear on `/login` and
+   `/signup` — leave it unset (or `false`) until steps 1–4 are actually done.
 
 ### 11.3 Give yourself (or anyone) free admin access
 

@@ -11,6 +11,10 @@ const fr: Dictionary = {
     backToHome: "Retour à l'accueil",
     menu: "Menu",
     language: "Langue",
+    terms: "Conditions",
+    privacy: "Confidentialité",
+    admin: "Admin",
+    signOut: "Se déconnecter",
   },
   landing: {
     nav: {
@@ -27,7 +31,7 @@ const fr: Dictionary = {
       note: "Sans inscription · Sans carte bancaire · Un lot complet de 50 en environ 3 minutes",
     },
     preview: {
-      url: "invoiceflow.ai/workspace",
+      url: "InvoiceFlow",
       extracting: "Extraction des données de facture…",
       extracted: (n) => `${n} factures extraites`,
       note: "Les champs peu fiables sont signalés, pas devinés — la ligne à 72% est une facture sans date d'échéance imprimée.",
@@ -56,6 +60,21 @@ const fr: Dictionary = {
         { title: "Rien n'est stocké", body: "Les factures restent en mémoire juste le temps d'être lues. Aucune base de données, aucun fichier conservé." },
         { title: "Devises multiples", body: "Lit EUR, GBP, USD, JOD, AED et plus — déduites du symbole quand elles ne sont pas indiquées." },
       ],
+    },
+    pricing: {
+      kicker: "Tarifs",
+      titleStart: "Commencez gratuitement.",
+      titleAccent: "Évoluez",
+      titleEnd: "quand ça le mérite.",
+      sub: "Chaque forfait offre la même qualité d'extraction — la différence est le nombre de factures traitées chaque mois.",
+      featureInvoices: (n: number) => `${n.toLocaleString()} factures / mois`,
+      featureConfidence: "Extraction avec score de confiance",
+      featureExcel: "Export Excel avec totaux",
+      mostPopular: "Le plus choisi",
+      startFree: "Commencer gratuitement",
+      choose: (name: string) => `Choisir ${name}`,
+      perMonth: "/mois",
+      note: "Prix affichés en USD. Annulez à tout moment depuis votre tableau de bord.",
     },
     closingCta: {
       titleStart: "Arrêtez de ressaisir les factures dans des",
@@ -157,6 +176,96 @@ const fr: Dictionary = {
     remove: "Supprimer",
     confidenceTooltip: "Confiance de l'IA — cliquez sur la valeur pour la corriger",
     extractionFailedFallback: "L'extraction a échoué.",
+  },
+  legal: {
+    backToHome: "Retour à l'accueil",
+    lastUpdated: (date: string) => `Dernière mise à jour : ${date}`,
+    terms: {
+      title: "Conditions d'utilisation",
+      updated: "20 août 2026",
+      sections: [
+        {
+          heading: "1. Avec qui est cet accord",
+          body: `Les présentes Conditions régissent votre utilisation d'InvoiceFlow (le « Service »), exploité par InvoiceFlow Inc. (« nous »). En créant un compte, vous acceptez ces Conditions ainsi que notre Politique de confidentialité.`,
+        },
+        {
+          heading: "2. Ce que fait le Service",
+          body: "InvoiceFlow reçoit les factures PDF que vous téléversez, les envoie à un modèle d'IA tiers pour en extraire des données structurées, et vous permet d'exporter les résultats sous forme de tableur. Nous ne vérifions pas l'exactitude des données extraites — il vous appartient de les vérifier avant de vous en servir à des fins comptables, fiscales ou de reporting financier.",
+        },
+        {
+          heading: "3. Comptes",
+          body: "Vous devez fournir des informations exactes lors de la création d'un compte et protéger vos identifiants. Vous êtes responsable de l'activité effectuée sous votre compte.",
+        },
+        {
+          heading: "4. Forfaits, facturation et résiliation",
+          body: "Les forfaits payants sont facturés mensuellement à l'avance et se renouvellent automatiquement jusqu'à résiliation. Vous pouvez résilier à tout moment depuis votre tableau de bord ; la résiliation prend effet à la fin de la période de facturation en cours, et nous n'accordons pas de remboursement au prorata sauf obligation légale. Nous pouvons modifier les prix ou limites des forfaits ; les changements s'appliquent aux prochaines périodes de facturation, pas à une période déjà payée.",
+        },
+        {
+          heading: "5. Utilisation acceptable",
+          body: "N'utilisez pas le Service pour traiter des documents que vous n'avez pas le droit de traiter, pour tenter de perturber ou surcharger le Service, ou pour contourner les limites d'utilisation.",
+        },
+        {
+          heading: "6. Avertissements",
+          body: `Le Service est fourni « en l'état ». Les données extraites par IA peuvent contenir des erreurs — c'est pourquoi chaque champ porte un score de confiance, et il vous incombe de vérifier les champs à faible confiance avant utilisation. Nous ne sommes pas responsables des décisions prises sur la base de données extraites.`,
+        },
+        {
+          heading: "7. Résiliation",
+          body: "Nous pouvons suspendre ou résilier les comptes qui enfreignent ces Conditions. Vous pouvez cesser d'utiliser le Service et supprimer votre compte à tout moment.",
+        },
+        {
+          heading: "8. Loi applicable",
+          body: "Les présentes Conditions sont régies par les lois de l'État du Delaware, États-Unis, sans égard aux principes de conflit de lois.",
+        },
+        {
+          heading: "9. Contact",
+          body: "Questions sur ces Conditions : legal@invoiceflow.app · +1 (555) 010-0199.",
+        },
+      ],
+    },
+    privacy: {
+      title: "Politique de confidentialité",
+      updated: "20 août 2026",
+      sections: [
+        {
+          heading: "1. Ce que nous collectons",
+          items: [
+            "Informations de compte : nom, e-mail et données d'authentification (y compris via la connexion Google, si vous l'utilisez).",
+            "Informations de facturation : gérées directement par Stripe — nous ne voyons ni ne stockons jamais votre numéro de carte.",
+            "Les fichiers de factures que vous téléversez, le temps nécessaire pour en extraire les données.",
+            "Données d'utilisation : votre forfait actuel et le nombre de factures traitées, pour faire respecter les limites du forfait.",
+          ],
+        },
+        {
+          heading: "2. Comment les fichiers de factures sont traités",
+          body: "Les PDF téléversés sont envoyés à l'API Gemini de Google pour l'extraction et ne sont pas stockés ensuite sur nos serveurs — nous conservons un fichier en mémoire seulement le temps de le transmettre et de renvoyer le résultat. Nous n'utilisons pas le contenu de vos factures pour entraîner un quelconque modèle.",
+        },
+        {
+          heading: "3. Avec qui nous partageons les données",
+          items: [
+            "Supabase — héberge notre base de données et gère l'authentification.",
+            "Stripe — traite les paiements et stocke les informations de facturation.",
+            "Google (API Gemini) — traite le contenu des factures pour en extraire les données.",
+          ],
+          body: "Nous ne vendons pas vos données.",
+        },
+        {
+          heading: "4. Conservation des données",
+          body: "Nous conservons les données de compte et d'utilisation tant que votre compte est actif. Vous pouvez demander la suppression de votre compte et des données associées à tout moment en nous contactant.",
+        },
+        {
+          heading: "5. Vos droits",
+          body: "Selon votre lieu de résidence, vous pouvez avoir le droit d'accéder à vos données personnelles, de les corriger ou de les supprimer, et de vous opposer à certains traitements. Contactez-nous pour exercer ces droits.",
+        },
+        {
+          heading: "6. Sécurité",
+          body: "Les données sont chiffrées en transit. L'accès aux données de production est limité à ce qui est nécessaire pour exploiter le Service.",
+        },
+        {
+          heading: "7. Contact",
+          body: "Questions sur cette politique : legal@invoiceflow.app · +1 (555) 010-0199.",
+        },
+      ],
+    },
   },
 };
 

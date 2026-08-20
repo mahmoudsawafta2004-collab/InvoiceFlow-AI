@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, LogIn } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { isGoogleAuthEnabled } from "@/lib/supabase/env";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,26 +63,30 @@ export function LoginForm() {
         <p className="mt-1 text-sm text-ink-2">Sign in to convert your invoices.</p>
       </div>
 
-      <Button
-        variant="outline"
-        size="lg"
-        className="w-full"
-        onClick={handleGoogle}
-        disabled={googleLoading}
-      >
-        {googleLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <GoogleIcon className="h-4 w-4" />
-        )}
-        Continue with Google
-      </Button>
+      {isGoogleAuthEnabled() && (
+        <>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full"
+            onClick={handleGoogle}
+            disabled={googleLoading}
+          >
+            {googleLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <GoogleIcon className="h-4 w-4" />
+            )}
+            Continue with Google
+          </Button>
 
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-line" />
-        <span className="text-[11px] uppercase tracking-wider text-ink-3">or</span>
-        <div className="h-px flex-1 bg-line" />
-      </div>
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-line" />
+            <span className="text-[11px] uppercase tracking-wider text-ink-3">or</span>
+            <div className="h-px flex-1 bg-line" />
+          </div>
+        </>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">

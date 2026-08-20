@@ -25,28 +25,39 @@ export interface CurrentUser {
   profile: Profile | null;
 }
 
-/** Returns null when signed out or Supabase isn't configured yet. */
+/**
+ * Returns null when signed out, Supabase isn't configured yet, or the Auth
+ * server call fails for any reason (network blip, transient 5xx). This must
+ * never throw: it runs at the top of every protected Server Component, and
+ * an uncaught error here previously took down the whole page with nothing
+ * rendered but the surrounding layout — "not signed in" is always a safe
+ * fallback, a broken page never is.
+ */
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const supabase = await createClient();
   if (!supabase) return null;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || !user.email) return null;
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user || !user.email) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
 
-  return {
-    id: user.id,
-    email: user.email,
-    isAdmin: isAdminEmail(user.email) || profile?.role === "admin",
-    profile: profile ?? null,
-  };
+    return {
+      id: user.id,
+      email: user.email,
+      isAdmin: isAdminEmail(user.email) || profile?.role === "admin",
+      profile: profile ?? null,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export interface UsageInfo {

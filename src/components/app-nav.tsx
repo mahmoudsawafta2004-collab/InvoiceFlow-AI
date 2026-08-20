@@ -13,6 +13,8 @@ import {
   ArrowUpRight,
   ShieldCheck,
   LogOut,
+  FileText,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/wordmark";
@@ -171,9 +173,31 @@ export function AppNav() {
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
                         <ShieldCheck className="h-4 w-4 text-accent" />
                       </span>
-                      <span className="text-[13px] font-medium text-ink">Admin</span>
+                      <span className="text-[13px] font-medium text-ink">{t.nav.admin}</span>
                     </Link>
                   )}
+
+                  <div className="my-1.5 h-px bg-line" />
+                  <Link
+                    href="/terms"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-[13px] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center">
+                      <FileText className="h-4 w-4" />
+                    </span>
+                    {t.nav.terms}
+                  </Link>
+                  <Link
+                    href="/privacy"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-[13px] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center">
+                      <Lock className="h-4 w-4" />
+                    </span>
+                    {t.nav.privacy}
+                  </Link>
 
                   <div className="my-1.5 h-px bg-line" />
                   <Link
@@ -201,7 +225,7 @@ export function AppNav() {
                           <span className="flex h-8 w-8 items-center justify-center">
                             <LogOut className="h-4 w-4" />
                           </span>
-                          Sign out
+                          {t.nav.signOut}
                         </button>
                       </form>
                     </>

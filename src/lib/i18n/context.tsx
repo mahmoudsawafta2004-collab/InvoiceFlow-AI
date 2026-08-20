@@ -21,8 +21,9 @@ function subscribe(listener: Listener) {
 }
 
 /**
- * The inline LocaleScript sets <html lang> before hydration based on
- * localStorage/navigator.language, which the server cannot know. Reading it
+ * The inline LocaleScript sets <html lang> before hydration based on a
+ * stored preference (English otherwise), which the server cannot know
+ * ahead of time. Reading it
  * with useSyncExternalStore — server snapshot pinned to English, client
  * snapshot the real DOM value — is what lets the very first client render
  * show the visitor's language without a hydration mismatch on every

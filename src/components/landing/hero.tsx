@@ -91,13 +91,13 @@ export function Hero() {
             animate="show"
             className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
           >
-            <Link href="/workspace" className="w-full sm:w-auto">
+            <Link href="/signup" className="w-full sm:w-auto">
               <Button variant="primary" size="lg" className="group w-full sm:w-auto">
                 {h.ctaPrimary}
                 <ArrowRight className="rtl:-scale-x-100 transition-transform duration-200 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
               </Button>
             </Link>
-            <Link href="/workspace" className="w-full sm:w-auto">
+            <Link href="/signup" className="w-full sm:w-auto">
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
                 {h.ctaSecondary}
               </Button>

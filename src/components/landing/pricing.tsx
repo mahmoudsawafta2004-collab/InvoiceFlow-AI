@@ -6,6 +6,7 @@ import type { Plan } from "@/lib/supabase/types";
 import { formatPrice } from "@/lib/plans";
 import { PricingButton } from "@/components/landing/pricing-button";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion-primitives";
+import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 
 const tints = [
@@ -16,6 +17,9 @@ const tints = [
 ];
 
 export function Pricing({ plans }: { plans: Plan[] }) {
+  const { t } = useI18n();
+  const p = t.landing.pricing;
+
   // The second-from-last paid tier reads as the "serious" choice — highlight it
   // rather than always the middle card, which breaks down at 4+ tiers.
   const highlightIndex = Math.min(plans.length - 2, plans.length - 1);
@@ -25,19 +29,16 @@ export function Pricing({ plans }: { plans: Plan[] }) {
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="mx-auto max-w-xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
-            Pricing
+            {p.kicker}
           </p>
           <h2 className="mt-3 text-balance-pretty text-3xl font-semibold tracking-[-0.03em] text-ink sm:text-4xl">
-            Start free.{" "}
+            {p.titleStart}{" "}
             <span className="font-display italic font-normal bg-gradient-to-r from-heading-blue-from to-heading-blue-to bg-clip-text text-transparent">
-              Scale
+              {p.titleAccent}
             </span>{" "}
-            when it earns its keep.
+            {p.titleEnd}
           </h2>
-          <p className="mt-4 text-balance-pretty text-ink-2">
-            Every plan gets the same extraction quality — the difference is how
-            many invoices you can run through it each month.
-          </p>
+          <p className="mt-4 text-balance-pretty text-ink-2">{p.sub}</p>
         </Reveal>
 
         <RevealGroup className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -58,7 +59,7 @@ export function Pricing({ plans }: { plans: Plan[] }) {
                 >
                   {highlighted && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-medium text-accent-ink">
-                      Most teams pick this
+                      {p.mostPopular}
                     </span>
                   )}
 
@@ -73,21 +74,23 @@ export function Pricing({ plans }: { plans: Plan[] }) {
 
                   <p className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-ink">
                     {formatPrice(plan.price_cents, plan.currency)}
-                    {!isFree && <span className="text-sm font-normal text-ink-3">/mo</span>}
+                    {!isFree && (
+                      <span className="text-sm font-normal text-ink-3">{p.perMonth}</span>
+                    )}
                   </p>
 
                   <ul className="mt-5 space-y-2.5 text-[13px] text-ink-2">
                     <li className="flex items-center gap-2">
                       <Check className="h-3.5 w-3.5 shrink-0 text-ok" />
-                      {plan.monthly_invoice_limit.toLocaleString()} invoices / month
+                      {p.featureInvoices(plan.monthly_invoice_limit)}
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-3.5 w-3.5 shrink-0 text-ok" />
-                      Confidence-scored extraction
+                      {p.featureConfidence}
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-3.5 w-3.5 shrink-0 text-ok" />
-                      Excel export with totals
+                      {p.featureExcel}
                     </li>
                   </ul>
 
@@ -97,7 +100,7 @@ export function Pricing({ plans }: { plans: Plan[] }) {
                     planKey={plan.key}
                     isFree={isFree}
                     highlighted={highlighted}
-                    label={isFree ? "Start free" : `Choose ${plan.name}`}
+                    label={isFree ? p.startFree : p.choose(plan.name)}
                   />
                 </motion.div>
               </RevealItem>
@@ -105,9 +108,7 @@ export function Pricing({ plans }: { plans: Plan[] }) {
           })}
         </RevealGroup>
 
-        <p className="mt-8 text-center text-[13px] text-ink-3">
-          Prices shown in USD. Cancel anytime from your dashboard.
-        </p>
+        <p className="mt-8 text-center text-[13px] text-ink-3">{p.note}</p>
       </div>
     </section>
   );

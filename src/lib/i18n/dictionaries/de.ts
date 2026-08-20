@@ -11,6 +11,10 @@ const de: Dictionary = {
     backToHome: "Zurück zur Startseite",
     menu: "Menü",
     language: "Sprache",
+    terms: "AGB",
+    privacy: "Datenschutz",
+    admin: "Admin",
+    signOut: "Abmelden",
   },
   landing: {
     nav: {
@@ -27,7 +31,7 @@ const de: Dictionary = {
       note: "Keine Anmeldung · Keine Kreditkarte · Ein voller Stapel von 50 in etwa 3 Minuten",
     },
     preview: {
-      url: "invoiceflow.ai/workspace",
+      url: "InvoiceFlow",
       extracting: "Rechnungsdaten werden extrahiert…",
       extracted: (n) => `${n} Rechnungen extrahiert`,
       note: "Felder mit geringer Konfidenz werden markiert, nicht geraten — die Zeile mit 72% ist eine Rechnung ohne aufgedrucktes Fälligkeitsdatum.",
@@ -56,6 +60,21 @@ const de: Dictionary = {
         { title: "Nichts wird gespeichert", body: "Rechnungen bleiben nur so lange im Arbeitsspeicher, wie sie zum Lesen gebraucht werden. Keine Datenbank, keine gespeicherten Dateien." },
         { title: "Gemischte Währungen", body: "Liest EUR, GBP, USD, JOD, AED und mehr — bei fehlender Kennzeichnung aus dem Symbol abgeleitet." },
       ],
+    },
+    pricing: {
+      kicker: "Preise",
+      titleStart: "Kostenlos starten.",
+      titleAccent: "Skalieren",
+      titleEnd: "wenn es sich lohnt.",
+      sub: "Jeder Plan bietet dieselbe Extraktionsqualität — der Unterschied ist, wie viele Rechnungen Sie monatlich verarbeiten können.",
+      featureInvoices: (n: number) => `${n.toLocaleString()} Rechnungen / Monat`,
+      featureConfidence: "Extraktion mit Konfidenzwert",
+      featureExcel: "Excel-Export mit Summen",
+      mostPopular: "Meistgewählt",
+      startFree: "Kostenlos starten",
+      choose: (name: string) => `${name} wählen`,
+      perMonth: "/Monat",
+      note: "Preise in USD. Jederzeit im Dashboard kündbar.",
     },
     closingCta: {
       titleStart: "Hören Sie auf, Rechnungen erneut in",
@@ -157,6 +176,96 @@ const de: Dictionary = {
     remove: "Entfernen",
     confidenceTooltip: "KI-Konfidenz — auf den Wert klicken, um ihn zu korrigieren",
     extractionFailedFallback: "Extraktion fehlgeschlagen.",
+  },
+  legal: {
+    backToHome: "Zurück zur Startseite",
+    lastUpdated: (date: string) => `Zuletzt aktualisiert: ${date}`,
+    terms: {
+      title: "Nutzungsbedingungen",
+      updated: "20. August 2026",
+      sections: [
+        {
+          heading: "1. Vertragspartner",
+          body: `Diese Bedingungen regeln Ihre Nutzung von InvoiceFlow (der „Dienst"), betrieben von InvoiceFlow Inc. („wir"). Mit der Erstellung eines Kontos stimmen Sie diesen Bedingungen und unserer Datenschutzerklärung zu.`,
+        },
+        {
+          heading: "2. Was der Dienst tut",
+          body: "InvoiceFlow nimmt von Ihnen hochgeladene Rechnungs-PDFs entgegen, sendet sie zur Extraktion strukturierter Daten an ein KI-Modell eines Drittanbieters und ermöglicht Ihnen den Export der Ergebnisse als Tabelle. Wir überprüfen die Genauigkeit der extrahierten Daten nicht — Sie sind dafür verantwortlich, diese vor der Verwendung für Buchhaltungs-, Steuer- oder Finanzberichtszwecke zu prüfen.",
+        },
+        {
+          heading: "3. Konten",
+          body: "Sie müssen bei der Kontoerstellung korrekte Angaben machen und Ihre Zugangsdaten sicher aufbewahren. Sie sind für Aktivitäten unter Ihrem Konto verantwortlich.",
+        },
+        {
+          heading: "4. Tarife, Abrechnung und Kündigung",
+          body: "Kostenpflichtige Tarife werden monatlich im Voraus abgerechnet und verlängern sich automatisch bis zur Kündigung. Sie können jederzeit über Ihr Dashboard kündigen; die Kündigung wird zum Ende des laufenden Abrechnungszeitraums wirksam, und wir erstatten anteilige Zeiträume nicht, außer gesetzlich vorgeschrieben. Wir können Preise oder Limits der Tarife ändern; Änderungen gelten für künftige Abrechnungszeiträume, nicht für einen bereits bezahlten.",
+        },
+        {
+          heading: "5. Zulässige Nutzung",
+          body: "Nutzen Sie den Dienst nicht, um Dokumente zu verarbeiten, zu deren Verarbeitung Sie nicht berechtigt sind, um den Dienst zu stören oder zu überlasten, oder um Nutzungslimits zu umgehen.",
+        },
+        {
+          heading: "6. Haftungsausschluss",
+          body: `Der Dienst wird „wie besehen" bereitgestellt. KI-extrahierte Daten können Fehler enthalten — deshalb trägt jedes Feld einen Konfidenzwert, und Sie sollten Felder mit niedriger Konfidenz vor der Nutzung prüfen. Wir haften nicht für Entscheidungen, die auf Basis extrahierter Daten getroffen wurden.`,
+        },
+        {
+          heading: "7. Kündigung durch uns",
+          body: "Wir können Konten sperren oder kündigen, die gegen diese Bedingungen verstoßen. Sie können die Nutzung des Dienstes jederzeit beenden und Ihr Konto löschen.",
+        },
+        {
+          heading: "8. Anwendbares Recht",
+          body: "Diese Bedingungen unterliegen dem Recht des US-Bundesstaats Delaware, ohne Berücksichtigung des Kollisionsrechts.",
+        },
+        {
+          heading: "9. Kontakt",
+          body: "Fragen zu diesen Bedingungen: legal@invoiceflow.app · +1 (555) 010-0199.",
+        },
+      ],
+    },
+    privacy: {
+      title: "Datenschutzerklärung",
+      updated: "20. August 2026",
+      sections: [
+        {
+          heading: "1. Was wir erheben",
+          items: [
+            "Kontoinformationen: Name, E-Mail und Authentifizierungsdaten (auch bei Anmeldung über Google, falls genutzt).",
+            "Zahlungsinformationen: werden direkt von Stripe verarbeitet — wir sehen oder speichern Ihre Kartennummer nie.",
+            "Von Ihnen hochgeladene Rechnungsdateien, nur für die Dauer der Datenextraktion.",
+            "Nutzungsdaten: Ihr aktueller Tarif und die Anzahl verarbeiteter Rechnungen, zur Durchsetzung der Tariflimits.",
+          ],
+        },
+        {
+          heading: "2. Umgang mit Rechnungsdateien",
+          body: "Hochgeladene PDFs werden zur Extraktion an Googles Gemini-API gesendet und danach nicht auf unseren Servern gespeichert — wir halten eine Datei nur so lange im Speicher, wie nötig ist, um sie weiterzuleiten und das Ergebnis zurückzugeben. Wir verwenden Ihre Rechnungsinhalte nicht zum Training von Modellen.",
+        },
+        {
+          heading: "3. Mit wem wir Daten teilen",
+          items: [
+            "Supabase — hostet unsere Datenbank und übernimmt die Authentifizierung.",
+            "Stripe — verarbeitet Zahlungen und speichert Abrechnungsdaten.",
+            "Google (Gemini API) — verarbeitet Rechnungsinhalte zur Datenextraktion.",
+          ],
+          body: "Wir verkaufen Ihre Daten nicht.",
+        },
+        {
+          heading: "4. Datenspeicherung",
+          body: "Wir bewahren Konto- und Nutzungsdaten auf, solange Ihr Konto aktiv ist. Sie können die Löschung Ihres Kontos und der zugehörigen Daten jederzeit bei uns beantragen.",
+        },
+        {
+          heading: "5. Ihre Rechte",
+          body: "Je nach Wohnort haben Sie möglicherweise das Recht, auf Ihre personenbezogenen Daten zuzugreifen, sie zu berichtigen oder zu löschen, sowie bestimmter Verarbeitung zu widersprechen. Kontaktieren Sie uns, um diese Rechte auszuüben.",
+        },
+        {
+          heading: "6. Sicherheit",
+          body: "Daten werden bei der Übertragung verschlüsselt. Der Zugriff auf Produktionsdaten ist auf das für den Betrieb des Dienstes Notwendige beschränkt.",
+        },
+        {
+          heading: "7. Kontakt",
+          body: "Fragen zu dieser Richtlinie: legal@invoiceflow.app · +1 (555) 010-0199.",
+        },
+      ],
+    },
   },
 };
 

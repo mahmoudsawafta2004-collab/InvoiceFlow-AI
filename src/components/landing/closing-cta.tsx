@@ -28,7 +28,7 @@ export function ClosingCta() {
           </span>
         </h2>
         <p className="mx-auto mt-4 max-w-md text-balance-pretty text-ink-2">{c.sub}</p>
-        <Link href="/workspace" className="mt-9 inline-block">
+        <Link href="/signup" className="mt-9 inline-block">
           <Button variant="primary" size="lg" className="group">
             {c.cta}
             <ArrowRight className="rtl:-scale-x-100 transition-transform duration-200 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />

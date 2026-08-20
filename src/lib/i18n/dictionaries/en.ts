@@ -14,6 +14,10 @@ const en = {
     backToHome: "Back to home",
     menu: "Menu",
     language: "Language",
+    terms: "Terms",
+    privacy: "Privacy",
+    admin: "Admin",
+    signOut: "Sign out",
   },
   landing: {
     nav: {
@@ -30,7 +34,7 @@ const en = {
       note: "No sign-up · No credit card · A full batch of 50 in about 3 minutes",
     },
     preview: {
-      url: "invoiceflow.ai/workspace",
+      url: "InvoiceFlow",
       extracting: "Extracting invoice data…",
       extracted: (n: number) => `${n} invoices extracted`,
       note: "Low-confidence fields are flagged, not guessed — the 72% row is an invoice with no due date printed on it.",
@@ -59,6 +63,21 @@ const en = {
         { title: "Nothing stored", body: "Invoices are held in memory only long enough to read them. No database, no files at rest." },
         { title: "Mixed currencies", body: "Reads EUR, GBP, USD, JOD, AED and more — inferred from symbols when unlabelled." },
       ],
+    },
+    pricing: {
+      kicker: "Pricing",
+      titleStart: "Start free.",
+      titleAccent: "Scale",
+      titleEnd: "when it earns its keep.",
+      sub: "Every plan gets the same extraction quality — the difference is how many invoices you can run through it each month.",
+      featureInvoices: (n: number) => `${n.toLocaleString()} invoices / month`,
+      featureConfidence: "Confidence-scored extraction",
+      featureExcel: "Excel export with totals",
+      mostPopular: "Most teams pick this",
+      startFree: "Start free",
+      choose: (name: string) => `Choose ${name}`,
+      perMonth: "/mo",
+      note: "Prices shown in USD. Cancel anytime from your dashboard.",
     },
     closingCta: {
       titleStart: "Stop retyping invoices into",
@@ -160,6 +179,96 @@ const en = {
     remove: "Remove",
     confidenceTooltip: "AI confidence — click the value to correct it",
     extractionFailedFallback: "Extraction failed.",
+  },
+  legal: {
+    backToHome: "Back to home",
+    lastUpdated: (date: string) => `Last updated: ${date}`,
+    terms: {
+      title: "Terms of Service",
+      updated: "August 20, 2026",
+      sections: [
+        {
+          heading: "1. Who this agreement is with",
+          body: `These Terms govern your use of InvoiceFlow (the "Service"), operated by InvoiceFlow Inc. ("we", "us"). By creating an account you agree to these Terms and to our Privacy Policy.`,
+        },
+        {
+          heading: "2. What the Service does",
+          body: "InvoiceFlow accepts invoice PDFs you upload, sends them to a third-party AI model to extract structured data, and lets you export the results as a spreadsheet. We do not verify the accuracy of extracted data — you are responsible for reviewing it before relying on it for accounting, tax, or financial reporting purposes.",
+        },
+        {
+          heading: "3. Accounts",
+          body: "You must provide accurate information when creating an account and keep your credentials secure. You are responsible for activity under your account.",
+        },
+        {
+          heading: "4. Plans, billing, and cancellation",
+          body: "Paid plans are billed monthly in advance and renew automatically until cancelled. You can cancel at any time from your dashboard; cancellation takes effect at the end of the current billing period, and we do not provide refunds for partial periods except where required by law. We may change plan prices or limits; changes apply to future billing periods, not one already paid for.",
+        },
+        {
+          heading: "5. Acceptable use",
+          body: "Don't use the Service to process documents you don't have the right to process, to attempt to disrupt or overload the Service, or to circumvent usage limits.",
+        },
+        {
+          heading: "6. Disclaimers",
+          body: `The Service is provided "as is". AI-extracted data may contain errors — that is why every field carries a confidence score, and you are expected to review low-confidence fields before use. We are not liable for decisions made based on extracted data.`,
+        },
+        {
+          heading: "7. Termination",
+          body: "We may suspend or terminate accounts that violate these Terms. You may stop using the Service and delete your account at any time.",
+        },
+        {
+          heading: "8. Governing law",
+          body: "These Terms are governed by the laws of the State of Delaware, United States, without regard to conflict-of-law principles.",
+        },
+        {
+          heading: "9. Contact",
+          body: "Questions about these Terms: legal@invoiceflow.app · +1 (555) 010-0199.",
+        },
+      ],
+    },
+    privacy: {
+      title: "Privacy Policy",
+      updated: "August 20, 2026",
+      sections: [
+        {
+          heading: "1. What we collect",
+          items: [
+            "Account info: name, email, and authentication data (including via Google sign-in, if you use it).",
+            "Billing info: handled directly by Stripe — we never see or store your card number.",
+            "Invoice files you upload, for the time it takes to extract their data.",
+            "Usage data: which plan you're on and how many invoices you've processed, to enforce plan limits.",
+          ],
+        },
+        {
+          heading: "2. How invoice files are handled",
+          body: "Uploaded PDFs are sent to Google's Gemini API for extraction and are not stored on our servers afterward — we keep a file in memory only long enough to forward it and return the result. We do not use your invoice content to train any model.",
+        },
+        {
+          heading: "3. Who we share data with",
+          items: [
+            "Supabase — hosts our database and handles authentication.",
+            "Stripe — processes payments and stores billing details.",
+            "Google (Gemini API) — processes invoice content to extract data.",
+          ],
+          body: "We do not sell your data.",
+        },
+        {
+          heading: "4. Data retention",
+          body: "We keep account and usage records for as long as your account is active. You can request deletion of your account and associated data at any time by contacting us.",
+        },
+        {
+          heading: "5. Your rights",
+          body: "Depending on where you live, you may have the right to access, correct, or delete your personal data, and to object to certain processing. Contact us to exercise these rights.",
+        },
+        {
+          heading: "6. Security",
+          body: "Data is encrypted in transit. Access to production data is limited to what's needed to operate the Service.",
+        },
+        {
+          heading: "7. Contact",
+          body: "Questions about this policy: legal@invoiceflow.app · +1 (555) 010-0199.",
+        },
+      ],
+    },
   },
 };
 
