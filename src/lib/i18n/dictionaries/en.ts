@@ -319,7 +319,7 @@ const en = {
       newPassword: "New password",
       submit: "Update password",
       doneTitle: "Password updated",
-      doneBody: "Taking you to the app…",
+      doneBody: "Taking you to the site…",
     },
     notConfigured: {
       title: "Accounts aren't set up yet",

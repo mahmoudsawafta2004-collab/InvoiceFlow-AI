@@ -316,7 +316,7 @@ const ar: Dictionary = {
       newPassword: "كلمة المرور الجديدة",
       submit: "تحديث كلمة المرور",
       doneTitle: "تم تحديث كلمة المرور",
-      doneBody: "جارٍ نقلك إلى التطبيق…",
+      doneBody: "جارٍ نقلك إلى الموقع…",
     },
     notConfigured: {
       title: "الحسابات غير مُفعّلة بعد",

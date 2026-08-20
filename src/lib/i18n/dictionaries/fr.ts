@@ -316,7 +316,7 @@ const fr: Dictionary = {
       newPassword: "Nouveau mot de passe",
       submit: "Mettre à jour",
       doneTitle: "Mot de passe mis à jour",
-      doneBody: "Redirection vers l'application…",
+      doneBody: "Redirection vers le site…",
     },
     notConfigured: {
       title: "Les comptes ne sont pas encore configurés",

@@ -316,7 +316,7 @@ const es: Dictionary = {
       newPassword: "Nueva contraseña",
       submit: "Actualizar contraseña",
       doneTitle: "Contraseña actualizada",
-      doneBody: "Llevándote a la aplicación…",
+      doneBody: "Llevándote al sitio…",
     },
     notConfigured: {
       title: "Las cuentas aún no están configuradas",
