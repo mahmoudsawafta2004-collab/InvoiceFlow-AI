@@ -7,6 +7,7 @@ import { ThemeScript } from "@/components/theme-script";
 import { I18nProvider } from "@/lib/i18n/context";
 import { RecoveryRedirect } from "@/components/auth/recovery-redirect";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALE_META, isLocale } from "@/lib/i18n/locales";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const sans = Instrument_Sans({
@@ -44,24 +45,12 @@ const DESCRIPTION =
 const OG_ALT = "InvoiceFlow — 50 invoice PDFs in. One clean spreadsheet out.";
 
 /**
- * Link previews (WhatsApp, LinkedIn, X, Slack) need absolute image URLs, so
- * Next needs to know the deployment's own origin. Set NEXT_PUBLIC_SITE_URL to
- * the production domain; on Vercel, VERCEL_URL covers preview deployments for
- * free, and localhost keeps `next dev` working with nothing configured.
- *
- * The preview image is served from `public/` and named here rather than using
+ * The preview image is served from `public/` and named below rather than using
  * the `opengraph-image.png` file convention on purpose: the convention bakes
  * the absolute URL at build time, so a deployment that sets the domain only at
- * runtime would keep advertising localhost. Resolving it against
- * metadataBase per request means the preview works either way.
+ * runtime would keep advertising localhost. Resolving it against metadataBase
+ * per request means the preview works either way.
  */
-function siteUrl(): URL {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
-  if (explicit) return new URL(explicit);
-  if (process.env.VERCEL_URL) return new URL(`https://${process.env.VERCEL_URL}`);
-  return new URL("http://localhost:3000");
-}
-
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
   title: TITLE,
