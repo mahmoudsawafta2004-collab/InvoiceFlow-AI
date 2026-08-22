@@ -465,3 +465,113 @@ product grows:
 - **Custom email sender.** Confirmation and reset emails come from
   Supabase's shared address by default; production volume needs your own
   SMTP configured in Supabase.
+
+---
+
+## 12. Domain, search, and link previews
+
+Everything in this section is about how the site presents itself *outside*
+itself — in a Google result, in a WhatsApp message, in a browser tab. The code
+side is already done and carries over to any domain; the parts that need doing
+per-domain are called out as such.
+
+### 12.1 Telling the app its own address
+
+Several things have to state the site's full address rather than a path: the
+link-preview image, `robots.txt`, and every URL in the sitemap. The app works
+this out in `src/lib/site-url.ts`, in this order:
+
+1. `NEXT_PUBLIC_SITE_URL` — set this and it wins, everywhere.
+2. `VERCEL_PROJECT_PRODUCTION_URL` — Vercel sets this to the project's
+   production domain, including a custom one once attached.
+3. `VERCEL_URL` — the current deployment's own generated address, so preview
+   deployments describe themselves correctly.
+4. `http://localhost:3000` for local development.
+
+**On Vercel with a custom domain attached, there is nothing to configure.**
+Anywhere else — another host, a custom server, a staging environment on a
+domain Vercel does not know about — set `NEXT_PUBLIC_SITE_URL` to the full
+origin with no trailing slash, e.g. `https://yourdomain.com`.
+
+> Do not point this at `VERCEL_URL` yourself, and do not hardcode a
+> `*.vercel.app` address. That URL is unique per deployment, so a sitemap
+> built from it lists pages belonging to a different host and Google rejects
+> every entry with *"URL not allowed for a Sitemap at this location"*.
+
+### 12.2 What is already built
+
+| File | Serves | Notes |
+|---|---|---|
+| `src/app/favicon.ico` | `/favicon.ico` | Browser tab, bookmarks, search results |
+| `src/app/icon.png` | `/icon.png` | 512px, for higher-density displays |
+| `src/app/apple-icon.png` | `/apple-icon.png` | iOS home screen |
+| `public/og.png` | `/og.png` | 1200×630 link-preview card |
+| `src/app/sitemap.ts` | `/sitemap.xml` | The five publicly reachable pages |
+| `src/app/robots.ts` | `/robots.txt` | Keeps crawlers out of the app screens |
+
+The sitemap lists only pages a stranger can land on cold: `/`, `/signup`,
+`/login`, `/terms`, `/privacy`. The workspace, dashboard, history and admin
+screens sit behind a session and would render an empty shell to a crawler, and
+the password-reset screens carry one-time tokens, so `robots.txt` disallows all
+of them.
+
+To change the preview card, replace `public/og.png` — keep it 1200×630. To
+change the icons, replace the three files above; they are cut from
+`public/invoiceflow-logo.png`.
+
+### 12.3 Google Search Console — per domain, ~10 minutes
+
+This is account-and-domain specific: it cannot be inherited with the code, so
+whoever owns the live site does it for their own domain and Google account.
+
+1. Go to [search.google.com/search-console](https://search.google.com/search-console).
+2. **Add property → Domain**, and enter the bare domain (`yourdomain.com`, no
+   `https://`).
+3. Google gives a TXT record. Add it in whatever manages the domain's DNS —
+   for a domain bought through or pointed at Vercel, that is the Vercel
+   dashboard under **Domains** — then click **Verify**.
+4. Open **Sitemaps** in the sidebar and submit the **full URL**:
+   `https://yourdomain.com/sitemap.xml`
+
+   A Domain property shows no prefix beside the input, so a bare `sitemap.xml`
+   is rejected as an invalid address — paste the whole thing.
+5. Confirm the row reads **Success** with 5 discovered pages. Anything else,
+   click the row for the per-URL reason.
+6. Optionally use **URL inspection → Request indexing** on the home page to
+   ask for a crawl sooner than the normal schedule.
+
+Zero clicks and impressions for the first days is normal for a new property.
+
+### 12.4 Caches, and why a change does not show up immediately
+
+Nothing here is broken; each of these is a cache with its own schedule.
+
+- **The favicon in Google results.** Fetched on Google's own crawl schedule,
+  separately from page indexing — days to weeks. Requesting indexing helps but
+  does not force it. Confirm your side is correct by opening
+  `https://yourdomain.com/favicon.ico` directly: if the browser shows the right
+  icon, the work is done and the rest is waiting.
+- **Link previews.** WhatsApp, LinkedIn and X each store the preview the first
+  time a link is shared. If a link was shared before the card existed, they
+  keep showing the old result until refreshed:
+  - WhatsApp and Facebook — [Sharing Debugger](https://developers.facebook.com/tools/debug/), *Scrape Again*
+  - LinkedIn — [Post Inspector](https://www.linkedin.com/post-inspector/)
+  - X — [Card Validator](https://cards-dev.twitter.com/validator)
+
+  Refresh these *after* deploying, not before, or the stale version is simply
+  cached again.
+- **The browser tab.** Usually a hard reload (Ctrl/Cmd+Shift+R); the tab icon
+  is cached per-site and can survive an ordinary refresh.
+
+### 12.5 Checklist when moving to a new domain
+
+1. Attach the domain in Vercel (or set `NEXT_PUBLIC_SITE_URL` elsewhere).
+2. Deploy.
+3. Open `/sitemap.xml` and `/robots.txt` and confirm they name the new domain
+   and not a `*.vercel.app` address.
+4. Add and verify the domain in Search Console, then submit the sitemap.
+5. Update Supabase's **Site URL** and **Redirect URLs** to the new domain, or
+   sign-in and password-reset links will keep pointing at the old one
+   (see 11.2).
+6. Update the contact details in the Terms and Privacy pages (see 11.5).
+7. Re-scrape the link preview with the tools in 12.4.
