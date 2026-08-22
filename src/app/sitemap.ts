@@ -14,16 +14,17 @@ export const dynamic = "force-dynamic";
  * dashboard, history and admin screens are behind a session and say nothing
  * useful to a crawler, and the password-reset screens are meaningless without
  * the token that leads to them.
+ *
+ * Deliberately just locations. `lastmod` would have to be invented here —
+ * rendering per request, any date built at call time claims every page changed
+ * this second, every time a crawler looks, and Google discards lastmod it
+ * cannot trust. `changefreq` and `priority` are ignored outright. Stating only
+ * what is true leaves nothing to be disbelieved.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl().origin;
-  const lastModified = new Date();
 
-  return [
-    { url: `${base}/`, lastModified, changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/signup`, lastModified, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${base}/login`, lastModified, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${base}/terms`, lastModified, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${base}/privacy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
-  ];
+  return ["/", "/signup", "/login", "/terms", "/privacy"].map((path) => ({
+    url: `${base}${path}`,
+  }));
 }
