@@ -179,21 +179,33 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "Extraction failed.";
 
+    // Codes matter as much as statuses here: the client retries transient
+    // failures on its own, and a bad key also surfaces as 503 — retrying that
+    // would just burn four attempts on something that cannot recover.
     if (/api[ _]?key/i.test(message) || /API_KEY_INVALID/i.test(message)) {
       return NextResponse.json(
-        { error: "Extraction is not available right now. Please try again later." },
+        {
+          error: "Extraction is not available right now. Please try again later.",
+          code: "NOT_CONFIGURED",
+        },
         { status: 503 }
       );
     }
     if (/quota|rate.?limit|429/i.test(message)) {
       return NextResponse.json(
-        { error: "Gemini rate limit reached. Wait a moment and try again." },
+        {
+          error: "Gemini rate limit reached. Wait a moment and try again.",
+          code: "RATE_LIMIT",
+        },
         { status: 429 }
       );
     }
     if (/503|overloaded|unavailable/i.test(message)) {
       return NextResponse.json(
-        { error: "Gemini is temporarily overloaded. Please retry this invoice." },
+        {
+          error: "Gemini is temporarily overloaded. Please retry this invoice.",
+          code: "OVERLOADED",
+        },
         { status: 503 }
       );
     }
