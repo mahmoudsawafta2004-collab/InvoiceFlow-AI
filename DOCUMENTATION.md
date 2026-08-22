@@ -364,6 +364,16 @@ page), so the button only renders once you've confirmed setup is done:
    redeploy. Only then does the Google button appear on `/login` and
    `/signup` — leave it unset (or `false`) until steps 1–4 are actually done.
 
+#### The consent-screen logo has to be square
+
+Under **Google Auth Platform → Branding**, the **App logo** slot is square and
+Google does not letterbox — a horizontal lockup gets squeezed into it and
+comes out too small to read. Upload `public/logo-square.png`, which is the
+mark on its own without the wordmark, sized for the 120×120 Google asks for.
+
+Changing the logo on an app Google has already verified sends it back for
+review, so set it before requesting verification rather than after.
+
 #### Why the consent screen says `<project-ref>.supabase.co`
 
 Google's account chooser shows "to continue to **<project-ref>.supabase.co**"
@@ -508,6 +518,7 @@ origin with no trailing slash, e.g. `https://yourdomain.com`.
 | `public/og.png` | `/og.png` | 1200×630 link-preview card |
 | `src/app/sitemap.ts` | `/sitemap.xml` | The five publicly reachable pages |
 | `src/app/robots.ts` | `/robots.txt` | Keeps crawlers out of the app screens |
+| `public/logo-square.png` | — | Square mark, for the Google consent screen (11.2) |
 
 The sitemap lists only pages a stranger can land on cold: `/`, `/signup`,
 `/login`, `/terms`, `/privacy`. The workspace, dashboard, history and admin
